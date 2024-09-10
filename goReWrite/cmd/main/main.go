@@ -1,12 +1,15 @@
 package main
 
 import (
+	"DevOps-Project/internal/initializers"
+
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func init() {
-
+	initializers.LoadEnv() 
+	initializers.ConnectDB()
 }
 
 func main() {
@@ -17,7 +20,7 @@ func main() {
 
 
 	
-	app.Get("/api/search",getSearch())
+	app.Get("/api/search", GetSearch)
 
 
 	err:= app.listen(":9090")
