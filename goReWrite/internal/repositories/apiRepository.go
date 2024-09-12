@@ -1,11 +1,27 @@
 package repositories
 
-import "DevOps-Project/internal/models"
+import (
+	"DevOps-Project/internal/initializers"
+	"DevOps-Project/internal/models"
 
-func GetSearchResults(query string, language string) []models.Page {
-	 var pages []models.Page
+	"gorm.io/gorm"
+)
 
-    DB.Where("language = ? AND content LIKE ?", language, "%"+query+"%").Find(&pages)
+type PageRepository interface {
+	SearchPages(q string, language string) ([]models.Page, error)
+}
 
-    return pages
+type pageRepository struct {
+	db *gorm.DB
+}
+
+func NewPageRepository(db *gorm.DB) PageRepository {
+	return &pageRepository{db}
+}
+
+func GetSearchResults(q string, language string) ([]models.Page, error) {
+	var pages []models.Page
+	query := "%" + q + "%"
+	err := initializers.DB.Where("language = ? AND content LIKE ?", language, query).Find(&pages).Error
+	return pages, err
 }

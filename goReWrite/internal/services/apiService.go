@@ -2,12 +2,21 @@ package services
 
 import (
 	"DevOps-Project/internal/models"
+	"DevOps-Project/internal/repositories"
 )
 
-func GetSearchResults(query string, language string) []models.Page {
- if query == "" {
-        return []Page{} // Return empty if no query
-    }
-    
-    return repository.SearchInDB(query, language)
+type PageService interface {
+	SearchPages(q string, language string) ([]models.Page, error)
+}
+
+type pageService struct {
+	repo repositories.PageRepository
+}
+
+func NewPageService(repo repository.PageRepository) PageService {
+	return &pageService{repo}
+}
+
+func GetSearchResults(q string, language string) ([]models.Page, error) {
+	return repositories.GetSearchResults(q, language)
 }

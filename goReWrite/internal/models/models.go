@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type Page struct {
 	gorm.Model
-	Content  string `json:"content"`
-	Language string `json:"language"`
+	ID       uint   `gorm:"primaryKey"`
+	Content  string `gorm:"type:text" json:"content"`
+	Language string `gorm:"type:varchar(5)" json:"language"`
 }
