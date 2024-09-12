@@ -36,7 +36,7 @@ def check_db_exists():
     """Checks if the database exists."""
     db_exists = os.path.exists(DATABASE_PATH)
     if not db_exists:
-        print "Database not found"
+        print ("Database not found")
         sys.exit(1)
     else:
         return db_exists
@@ -48,14 +48,14 @@ def init_db():
         with app.open_resource('../schema.sql') as f:
             db.cursor().executescript(f.read().decode('utf-8'))
         db.commit()
-        print "Initialized the database: " + str(DATABASE_PATH)
+print("Initialized the database: " + str(DATABASE_PATH))
 
 
 def query_db(query, args=(), one=False):
     """Queries the database and returns a list of dictionaries."""
     cur = g.db.execute(query, args)
     rv = [dict((cur.description[idx][0], value)
-               for idx, value in enumerate(row)) for row in cur.fetchall()]
+            for idx, value in enumerate(row)) for row in cur.fetchall()]
     return (rv[0] if rv else None) if one else rv
 
 
