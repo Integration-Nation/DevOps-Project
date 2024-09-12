@@ -15,7 +15,6 @@ type pageRepository struct {
 	db *gorm.DB
 }
 
-
 func GetSearchResults(q string, language string) ([]models.Page, error) {
 	var pages []models.Page
 	query := "%" + q + "%"
