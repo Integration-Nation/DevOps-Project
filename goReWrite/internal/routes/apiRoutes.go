@@ -1,8 +1,12 @@
 package routes
 
-import "github.com/gofiber/fiber"
+import (
+	"DevOps-Project/internal/controllers"
 
-func apiRoutes(app *fiber.App, ac controllers) {
+	"github.com/gofiber/fiber/v2"
+)
+
+func ApiRoutes(app *fiber.App) {
 	api:= app.Group("/api")
-	api.Get("/search")
+	api.Get("/search", controllers.GetSearchResults)
 }
