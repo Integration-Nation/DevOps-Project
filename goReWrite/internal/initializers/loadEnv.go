@@ -13,4 +13,3 @@ func LoadEnv() {
 		log.Fatal("Error loading .env file")
 	}
 }
-

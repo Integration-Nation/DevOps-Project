@@ -4,17 +4,18 @@ import (
 	"os"
 
 	"gorm.io/driver/sqlite"
+
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 
-func ConnectDB(){
+func ConnectDB() {
 	var err error
 	dsn := os.Getenv("DB_URL")
-	DB,err=gorm.Open(sqlite.Open(dsn), &gorm.Config{})
+	DB, err = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 
-	if err!= nil{
+	if err != nil {
 		panic("failed to connect database")
 	}
 }
