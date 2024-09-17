@@ -1,37 +1,44 @@
-# # Stage 1: Build stage
-# FROM golang:1.23-alpine AS build
+# Use the official Golang image as the build stage
+FROM golang:1.23 AS builder
 
-# # Opretter en mappe i containeren
-# WORKDIR /app
+# Set the Current Working Directory inside the container
+WORKDIR /app
 
-# # Copy go.mod and go.sum to download dependencies
-# COPY go.mod go.sum ./
+# Copy the go.mod and go.sum files
+COPY go.mod go.sum ./
 
-# # Download afhængigheder
-# RUN go mod download
+# Download the Go modules
+RUN go mod download
 
-# # Kopier hele projektet til containeren
-# COPY . .
+# Copy the source code into the container
+COPY . .
 
-# # Byg applikationen
-# RUN go build -o main ./cmd/main
+# Copy the .env file if it exists
+COPY .env .env
 
+# Build the Go app
+RUN go build -o main ./cmd/main
 
-# # Stage 2: Runtime stage (mindre image)
-# FROM alpine:latest
+# Start a new stage from scratch with Ubuntu
+FROM ubuntu:latest
 
-# # Opret et nyt arbejdsdirectory
-# WORKDIR /app
+# Install necessary dependencies
+RUN apt-get update && apt-get install -y ca-certificates
 
-# # Kopier den binære fil fra build-stagen
-# COPY --from=build /app/main .
+# Set the Current Working Directory inside the container
+WORKDIR /root/
 
-# # Expose porten applikationen vil køre på
-# EXPOSE 9090
+# Copy the pre-built binary file from the previous stage
+COPY --from=builder /app/main .
 
-# # Definér entrypoint kommandoen for at køre applikationen
-# CMD ["./main"]
+# Copy the .env file
+COPY --from=builder /app/.env .
 
+# Verify the binary file is copied correctly
+RUN ls -l /root/
 
-FROM alpine:latest
-CMD ["echo", "Hello, World!"]
+# Command to run the executable
+CMD ["./main"]
+
+# Expose the port the app runs on
+EXPOSE 9090
