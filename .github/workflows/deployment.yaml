@@ -35,8 +35,13 @@ jobs:
             # Stop and remove existing containers
             sudo docker-compose down &&
             
-            # Remove the specific Docker image for the app service
-            sudo docker rmi gorewrite_app &&
+             # Check if the image exists, and if so, remove it
+            if sudo docker images -q gorewrite_app > /dev/null 2>&1; then
+              echo "Image found. Removing gorewrite_app image..." &&
+              sudo docker rmi gorewrite_app
+            else
+              echo "Image gorewrite_app does not exist. Skipping removal."
+            fi &&
             
             # Build and start new containers
             sudo docker-compose up -d
