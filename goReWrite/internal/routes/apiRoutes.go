@@ -9,4 +9,5 @@ import (
 func ApiRoutes(app *fiber.App) {
 	api:= app.Group("/api")
 	api.Get("/search", controllers.GetSearchResults)
+
 }

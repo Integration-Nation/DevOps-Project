@@ -21,6 +21,10 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New())
 
+
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("Hello, World!")
+	})
 	routes.ApiRoutes(app)
 
 	err := app.Listen(":9090")
@@ -28,3 +32,4 @@ func main() {
 		panic(err)
 	}
 }
+
