@@ -27,7 +27,7 @@ jobs:
       - name: SSH Command
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '
-            cd ./test/DevOps-Project/ &&
+            cd ./${{ secrets.WORK_DIR }} &&
             git pull https://github.com/Integration-Nation/DevOps-Project.git &&
             cd goReWrite
             pwd &&
