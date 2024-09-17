@@ -33,10 +33,10 @@ jobs:
             ls -a &&
             
             # Stop and remove existing containers
-            docker-compose down &&
+            docker compose down &&
             
             # Remove the specific Docker image for the app service
-            docker rmi libra_backend_app &&
+            docker rmi gorewrite-app &&
             
             # Build and start new containers
             docker compose up -d
