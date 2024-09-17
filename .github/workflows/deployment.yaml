@@ -1,4 +1,4 @@
-# .github/workflows/deployment.yml
+# .github/workflows/deployment.yaml
 name: Docker Compose Workflow
 
 on:
