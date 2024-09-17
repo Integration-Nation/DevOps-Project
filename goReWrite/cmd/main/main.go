@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	initializers.LoadEnv() 
+	initializers.LoadEnv()
 	initializers.ConnectDB()
 }
 
@@ -21,13 +21,10 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New())
 
-
-	
 	routes.ApiRoutes(app)
 
-
-	err:= app.Listen(":9090")
-	if err!= nil {
+	err := app.Listen(":9090")
+	if err != nil {
 		panic(err)
 	}
 }
