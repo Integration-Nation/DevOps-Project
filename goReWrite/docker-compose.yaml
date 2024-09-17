@@ -1,10 +1,11 @@
 version: "3.8"
 
 services:
-  sqlite:
-    image: nouchka/sqlite3:latest # SQLite image
-    container_name: sqlite_container
+  app:
+    build: .
+    ports:
+      - "9090:9090"
     volumes:
-      - ./data:/data
-    entrypoint: ["sqlite3"]
-    command: ["/data/your-database.db"]
+      - .:/app
+    environment:
+      - DATABASE_PATH=/app/data/whoknows.db

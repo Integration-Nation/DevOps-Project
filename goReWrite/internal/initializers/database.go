@@ -11,7 +11,7 @@ var DB *gorm.DB
 
 func ConnectDB(){
 	var err error
-	dsn := os.Getenv("DB_URL")
+	dsn := os.Getenv("DATABASE_PATH")
 	DB,err=gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 
 	if err!= nil{
