@@ -28,6 +28,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '
             cd ./test/DevOps-Project/ &&
             git pull https://github.com/Integration-Nation/DevOps-Project.git &&
+            cd goReWrite
             pwd &&
             ls -a &&
             
