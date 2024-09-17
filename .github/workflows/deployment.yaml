@@ -1,0 +1,42 @@
+# .github/workflows/deployment.yml
+name: Docker Compose Workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.PRIVATE_KEY }}
+
+      - name: SSH Command
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '
+            cd ./test &&
+            git pull https://github.com/Integration-Nation/DevOps-Project.git &&
+            pwd &&
+            ls -a &&
+            
+            # Stop and remove existing containers
+            docker-compose down &&
+            
+            # Remove the specific Docker image for the app service
+            docker rmi libra_backend_app &&
+            
+            # Build and start new containers
+            docker-compose up -d
+          '
