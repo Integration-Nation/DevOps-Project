@@ -6,7 +6,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-t
+type PageControllerI interface {
+	GetSearchResults(c *fiber.Ctx) error
+}
 
 type PageController struct {
 	service services.PageServiceI
