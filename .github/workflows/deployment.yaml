@@ -36,8 +36,7 @@ jobs:
             # Stop and remove existing containers
             sudo docker-compose down &&
             
-            # Remove the specific Docker image for the app service
-            sudo docker rmi gorewrite_app &&
+
             
             # Build and start new containers
             sudo docker-compose up -d &&  sudo docker image prune -f 
