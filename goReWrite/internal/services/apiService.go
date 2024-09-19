@@ -5,15 +5,18 @@ import (
 	"DevOps-Project/internal/repositories"
 )
 
-type PageService interface {
-	SearchPages(q string, language string) ([]models.Page, error)
+type PageServiceI interface {
+	GetSearchResults(q string, language string) ([]models.Page, error)
 }
 
-type pageService struct {
-	repo repositories.PageRepository
+type PageService struct {
+	repo repositories.PageRepositoryI
 }
 
+func NewPageService(repo repositories.PageRepositoryI) *PageService {
+	return &PageService{repo: repo}
+}
 
-func GetSearchResults(q string, language string) ([]models.Page, error) {
-	return repositories.GetSearchResults(q, language)
+func (ps *PageService) GetSearchResults(q string, language string) ([]models.Page, error) {
+	return ps.repo.GetSearchResults(q, language)
 }

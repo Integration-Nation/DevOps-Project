@@ -6,8 +6,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func ApiRoutes(app *fiber.App) {
+func ApiRoutes(app *fiber.App, pc controllers.PageController) {
 	api := app.Group("/api")
-	api.Post("/search", controllers.GetSearchResults)
+	api.Post("/search", pc.GetSearchResults)
 
 }

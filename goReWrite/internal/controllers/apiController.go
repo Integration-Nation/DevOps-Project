@@ -6,16 +6,18 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+t
+
 type PageController struct {
-	service services.PageService
+	service services.PageServiceI
 }
 
-func NewPageController(service services.PageService) *PageController {
-	return &PageController{service}
+func NewPageController(service services.PageServiceI) *PageController {
+	return &PageController{service: service}
 }
 
 // Ctx er res og req
-func GetSearchResults(c *fiber.Ctx) error {
+func (pc *PageController) GetSearchResults(c *fiber.Ctx) error {
 	q := c.Query("q")
 	language := c.Query("language", "en")
 
@@ -23,7 +25,7 @@ func GetSearchResults(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"search_results": []string{}})
 	}
 
-	pages, err := services.GetSearchResults(q, language)
+	pages, err := pc.service.GetSearchResults(q, language)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}

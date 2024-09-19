@@ -7,15 +7,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type PageRepository interface {
-	SearchPages(q string, language string) ([]models.Page, error)
+type PageRepositoryI interface {
+	GetSearchResults(q string, language string) ([]models.Page, error)
 }
 
-type pageRepository struct {
+type PageRepository struct {
 	db *gorm.DB
 }
 
-func GetSearchResults(q string, language string) ([]models.Page, error) {
+func NewPageRepository(db *gorm.DB) *PageRepository {
+	return &PageRepository{db: db}
+}
+
+func (pr *PageRepository) GetSearchResults(q string, language string) ([]models.Page, error) {
 	var pages []models.Page
 	query := "%" + q + "%"
 	err := initializers.DB.Where("language = ? AND content LIKE ?", language, query).Find(&pages).Error
