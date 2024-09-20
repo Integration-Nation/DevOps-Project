@@ -16,6 +16,11 @@ func UserRoutes(app *fiber.App, uc controllers.UserControllerI) {
 	api := app.Group("/api")
 	api.Post("/register", uc.Register)
 	api.Post("/login", uc.Login)
-	//api.Post("/logout", uc.Logout)
+	api.Get("/logout", uc.Logout)
 	api.Get("/users", uc.GetAllUsers)
+}
+
+func WeatherRoutes(app *fiber.App, wc controllers.WeatherControllerI) {
+		api := app.Group("/api")
+	api.Get("/weather", wc.GetWeather)
 }

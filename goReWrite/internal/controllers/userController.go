@@ -11,6 +11,7 @@ type UserControllerI interface {
 	Login(c *fiber.Ctx) error
 	GetAllUsers(c *fiber.Ctx) error
 	Register(c *fiber.Ctx) error
+	Logout(c *fiber.Ctx) error
 }
 
 type UserController struct {
@@ -76,4 +77,8 @@ func (uc *UserController) Register(c *fiber.Ctx) error {
     return c.Status(fiber.StatusCreated).JSON(fiber.Map{
         "message": "User registered successfully!",
     })
+}
+
+func (uc *UserController) Logout(c *fiber.Ctx) error {
+	return c.SendString("Logged Out")
 }

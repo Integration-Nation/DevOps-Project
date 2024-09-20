@@ -33,8 +33,12 @@ func main() {
 	userService := services.NewUserService(userRepo)
 	userController := controllers.NewUserController(userService)
 
+	weatherService := services.NewWeatherService()
+	weatherController := controllers.NewWeatherController(weatherService)
+
 	routes.PageRoutes(app, pageController)
 	routes.UserRoutes(app, userController)
+	routes.WeatherRoutes(app, weatherController)
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")

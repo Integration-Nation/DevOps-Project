@@ -27,3 +27,8 @@ type RegisterRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type Weather struct {
+	Temperature int    `json:"temperature"`
+	Condition   string `json:"condition"`
+}
