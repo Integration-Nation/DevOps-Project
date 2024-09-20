@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"DevOps-Project/internal/initializers"
 	"DevOps-Project/internal/models"
 
 	"gorm.io/gorm"
@@ -22,6 +21,6 @@ func NewPageRepository(db *gorm.DB) *PageRepository {
 func (pr *PageRepository) GetSearchResults(q string, language string) ([]models.Page, error) {
 	var pages []models.Page
 	query := "%" + q + "%"
-	err := initializers.DB.Where("language = ? AND content LIKE ?", language, query).Find(&pages).Error
+	err := pr.db.Where("language = ? AND content LIKE ?", language, query).Find(&pages).Error
 	return pages, err
 }

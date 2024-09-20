@@ -20,6 +20,7 @@ func init() {
 func main() {
 
 	initializers.DB.AutoMigrate(&models.Page{})
+	initializers.DB.AutoMigrate(&models.User{})
 
 	app := fiber.New()
 	app.Use(cors.New())
@@ -28,10 +29,20 @@ func main() {
 	pageService := services.NewPageService(pageRepo)
 	pageController := controllers.NewPageController(pageService)
 
+	userRepo := repositories.NewUserRepository(initializers.DB)
+	userService := services.NewUserService(userRepo)
+	userController := controllers.NewUserController(userService)
+
+	weatherService := services.NewWeatherService()
+	weatherController := controllers.NewWeatherController(weatherService)
+
+	routes.PageRoutes(app, pageController)
+	routes.UserRoutes(app, userController)
+	routes.WeatherRoutes(app, weatherController)
+
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
-	routes.ApiRoutes(app, pageController)
 
 	err := app.Listen(":9090")
 	if err != nil {

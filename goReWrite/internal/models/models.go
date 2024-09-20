@@ -9,3 +9,26 @@ type Page struct {
 	LastUpdated time.Time `gorm:"type:timestamp" json:"last_updated"`
 	Content     string    `gorm:"type:text" json:"content"`
 }
+
+type User struct {
+	ID       uint   `gorm:"primaryKey" json:"id"`
+	Username string `gorm:"unique" json:"username"`
+	Email    string `gorm:"unique" json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type RegisterRequest struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type Weather struct {
+	Temperature int    `json:"temperature"`
+	Condition   string `json:"condition"`
+}
