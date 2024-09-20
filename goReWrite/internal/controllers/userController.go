@@ -1,0 +1,57 @@
+package controllers
+
+import (
+	"DevOps-Project/internal/models"
+	"DevOps-Project/internal/services"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+type UserControllerI interface {
+	Login(c *fiber.Ctx) error
+	GetAllUsers(c *fiber.Ctx) error
+}
+
+type UserController struct {
+	service services.UserServiceI
+}
+
+func NewUserController(service services.UserServiceI) *UserController {
+	return &UserController{service: service}
+}
+
+func (uc *UserController) Login(c *fiber.Ctx) error {
+	var req models.LoginRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request format",
+		})
+	}
+
+	// Verify the user credentials
+	user, err := uc.service.VerifyLogin(req.Username, req.Password)
+	if err != nil {
+		// Return an unauthorized status with an error message in JSON
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// On success, return a JSON response with the user info or token
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":  "Login successful",
+		"user_id":  user.ID,
+		"username": user.Username,
+	})
+}
+
+func (uc *UserController) GetAllUsers(c *fiber.Ctx) error {
+
+	// Get all users from the database
+	users := uc.service.GetAllUsers()
+
+	// On success, return a JSON response with the users
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"users": users,
+	})
+}
