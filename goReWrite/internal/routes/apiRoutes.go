@@ -14,7 +14,7 @@ func PageRoutes(app *fiber.App, pc controllers.PageControllerI) {
 
 func UserRoutes(app *fiber.App, uc controllers.UserControllerI) {
 	api := app.Group("/api")
-	//api.Post("/register", uc.Register)
+	api.Post("/register", uc.Register)
 	api.Post("/login", uc.Login)
 	//api.Post("/logout", uc.Logout)
 	api.Get("/users", uc.GetAllUsers)

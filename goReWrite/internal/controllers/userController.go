@@ -10,6 +10,7 @@ import (
 type UserControllerI interface {
 	Login(c *fiber.Ctx) error
 	GetAllUsers(c *fiber.Ctx) error
+	Register(c *fiber.Ctx) error
 }
 
 type UserController struct {
@@ -54,4 +55,25 @@ func (uc *UserController) GetAllUsers(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"users": users,
 	})
+}
+
+func (uc *UserController) Register(c *fiber.Ctx) error {
+	var req models.RegisterRequest
+	
+		if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request format",
+		})
+	}
+
+    _, err := uc.service.RegisterUser(req.Username, req.Email, req.Password)
+    if err != nil {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+            "error": err.Error(),
+        })
+    }
+
+    return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+        "message": "User registered successfully!",
+    })
 }
