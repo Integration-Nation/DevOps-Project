@@ -3,7 +3,10 @@ package services
 import (
 	"DevOps-Project/internal/models"
 	"DevOps-Project/internal/repositories"
+	"DevOps-Project/internal/utilities"
 	"errors"
+
+	"go.uber.org/zap"
 )
 
 type UserServiceI interface {
@@ -13,11 +16,15 @@ type UserServiceI interface {
 }
 
 type UserService struct {
-	repo repositories.UserRepositoryI
+	repo   repositories.UserRepositoryI
+	logger *zap.Logger
 }
 
 func NewUserService(repo repositories.UserRepositoryI) *UserService {
-	return &UserService{repo: repo}
+	return &UserService{
+		repo:   repo,
+		logger: utilities.NewLogger(),
+	}
 }
 
 func (us *UserService) VerifyLogin(username, password string) (*models.User, error) {
@@ -31,13 +38,14 @@ func (us *UserService) GetAllUsers() *[]models.User {
 
 func (us *UserService) RegisterUser(username, email, password string) (*models.User, error) {
 
-    // Check if username already exists
-    existingUser, _ := us.repo.FindByUsername(username)
- 
-    if existingUser != nil {
-        return nil, errors.New("the username is already taken")
-    }
+	// Check if username already exists
+	existingUser, _ := us.repo.FindByUsername(username)
 
-    // Create the user
-    return us.repo.CreateUser(username, email, password)
+	if existingUser != nil {
+		us.logger.Info("Username already taken", zap.String("username", username))
+		return nil, errors.New("the username is already taken")
+	}
+
+	// Create the user
+	return us.repo.CreateUser(username, email, password)
 }

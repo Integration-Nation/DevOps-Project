@@ -3,9 +3,11 @@ package controllers
 import (
 	"DevOps-Project/internal/models"
 	"DevOps-Project/internal/services"
+	"DevOps-Project/internal/utilities"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 )
 
 type UserControllerI interface {
@@ -18,24 +20,28 @@ type UserControllerI interface {
 type UserController struct {
 	service  services.UserServiceI
 	validate *validator.Validate
+	logger   *zap.Logger
 }
 
 func NewUserController(service services.UserServiceI, validate *validator.Validate) *UserController {
 	return &UserController{
 		service:  service,
 		validate: validate,
+		logger:   utilities.NewLogger(),
 	}
 }
 
 func (uc *UserController) Login(c *fiber.Ctx) error {
 	var req models.LoginRequest
 	if err := c.BodyParser(&req); err != nil {
+		uc.logger.Error("Error parsing login request body", zap.Error(err))
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request format",
 		})
 	}
 
 	if err := uc.validate.Struct(req); err != nil {
+		uc.logger.Error("Error validating login request", zap.Error(err))
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -73,12 +79,14 @@ func (uc *UserController) Register(c *fiber.Ctx) error {
 	var req models.RegisterRequest
 
 	if err := c.BodyParser(&req); err != nil {
+		uc.logger.Error("Error parsing register request body", zap.Error(err))
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request format",
 		})
 	}
 
 	if err := uc.validate.Struct(req); err != nil {
+		uc.logger.Error("Error validating register request", zap.Error(err))
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -86,6 +94,7 @@ func (uc *UserController) Register(c *fiber.Ctx) error {
 
 	_, err := uc.service.RegisterUser(req.Username, req.Email, req.Password)
 	if err != nil {
+		uc.logger.Error("Error registering user", zap.Error(err))
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
