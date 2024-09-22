@@ -4,6 +4,7 @@ import (
 	"DevOps-Project/internal/models"
 	"DevOps-Project/internal/services"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -15,11 +16,15 @@ type UserControllerI interface {
 }
 
 type UserController struct {
-	service services.UserServiceI
+	service  services.UserServiceI
+	validate *validator.Validate
 }
 
-func NewUserController(service services.UserServiceI) *UserController {
-	return &UserController{service: service}
+func NewUserController(service services.UserServiceI, validate *validator.Validate) *UserController {
+	return &UserController{
+		service:  service,
+		validate: validate,
+	}
 }
 
 func (uc *UserController) Login(c *fiber.Ctx) error {
@@ -27,6 +32,12 @@ func (uc *UserController) Login(c *fiber.Ctx) error {
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request format",
+		})
+	}
+
+	if err := uc.validate.Struct(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
 		})
 	}
 
@@ -60,23 +71,29 @@ func (uc *UserController) GetAllUsers(c *fiber.Ctx) error {
 
 func (uc *UserController) Register(c *fiber.Ctx) error {
 	var req models.RegisterRequest
-	
-		if err := c.BodyParser(&req); err != nil {
+
+	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request format",
 		})
 	}
 
-    _, err := uc.service.RegisterUser(req.Username, req.Email, req.Password)
-    if err != nil {
-        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-            "error": err.Error(),
-        })
-    }
+	if err := uc.validate.Struct(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
 
-    return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-        "message": "User registered successfully!",
-    })
+	_, err := uc.service.RegisterUser(req.Username, req.Email, req.Password)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "User registered successfully!",
+	})
 }
 
 func (uc *UserController) Logout(c *fiber.Ctx) error {

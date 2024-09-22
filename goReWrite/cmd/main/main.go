@@ -8,6 +8,7 @@ import (
 	"DevOps-Project/internal/routes"
 	"DevOps-Project/internal/services"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
@@ -25,13 +26,15 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New())
 
+	v := validator.New()
+
 	pageRepo := repositories.NewPageRepository(initializers.DB)
 	pageService := services.NewPageService(pageRepo)
-	pageController := controllers.NewPageController(pageService)
+	pageController := controllers.NewPageController(pageService, v)
 
 	userRepo := repositories.NewUserRepository(initializers.DB)
 	userService := services.NewUserService(userRepo)
-	userController := controllers.NewUserController(userService)
+	userController := controllers.NewUserController(userService, v)
 
 	weatherService := services.NewWeatherService()
 	weatherController := controllers.NewWeatherController(weatherService)
