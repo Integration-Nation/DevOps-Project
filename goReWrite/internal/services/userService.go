@@ -4,8 +4,8 @@ import (
 	"DevOps-Project/internal/models"
 	"DevOps-Project/internal/repositories"
 	"DevOps-Project/internal/utilities"
+	"DevOps-Project/internal/security"
 	"errors"
-
 	"go.uber.org/zap"
 )
 
@@ -28,7 +28,17 @@ func NewUserService(repo repositories.UserRepositoryI) *UserService {
 }
 
 func (us *UserService) VerifyLogin(username, password string) (*models.User, error) {
-	return us.repo.FindByUsername(username)
+		user, err:= us.repo.FindByUsername(username)
+		if err != nil {
+			us.logger.Error("Failed to find user by username", zap.Error(err))
+			return nil, errors.New("internal server error")
+		}
+		
+		if err:= security.ComparePasswords(user.Password, password); err != nil {
+			us.logger.Error("Failed to compare passwords", zap.Error(err))
+			return nil, errors.New("internal server error")
+		}
+		return user, nil
 
 }
 
@@ -46,6 +56,12 @@ func (us *UserService) RegisterUser(username, email, password string) (*models.U
 		return nil, errors.New("the username is already taken")
 	}
 
+	hashedPassword, err := security.HashPassword(password)
+    if err != nil {
+        us.logger.Error("Failed to hash password", zap.Error(err))
+        return nil, errors.New("internal server error")
+    }
+
 	// Create the user
-	return us.repo.CreateUser(username, email, password)
+	return us.repo.CreateUser(username, email, hashedPassword)
 }
