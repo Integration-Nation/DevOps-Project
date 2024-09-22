@@ -1,6 +1,5 @@
 To do list:
 
-1. Api routes rewrite
-2. Controller functions
-3. Database initializer
-4. ENV loader
+3. SonarQube
+4. Linting
+5. Weather
