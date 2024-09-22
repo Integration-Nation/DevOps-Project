@@ -27,7 +27,7 @@ func NewUserService(repo repositories.UserRepositoryI) *UserService {
 	}
 }
 
-func (us *UserService) VerifyLogin(username, password string) (*models.User, error) {
+func (us *UserService) VerifyLogin(username, password string) (string, error) {
 		user, err:= us.repo.FindByUsername(username)
 		if err != nil {
 			us.logger.Error("Failed to find user by username", zap.Error(err))
@@ -38,7 +38,14 @@ func (us *UserService) VerifyLogin(username, password string) (*models.User, err
 			us.logger.Error("Failed to compare passwords", zap.Error(err))
 			return nil, errors.New("internal server error")
 		}
-		return user, nil
+
+		token, err := security.GenerateJWT(user.ID, user.Username)
+    if err != nil {
+        us.logger.Error("Failed to generate JWT token", zap.Error(err))
+        return "", errors.New("could not generate token")
+    }
+
+		return token, nil
 
 }
 
