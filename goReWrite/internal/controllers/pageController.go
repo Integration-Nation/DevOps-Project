@@ -3,6 +3,7 @@ package controllers
 import (
 	"DevOps-Project/internal/services"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -12,10 +13,14 @@ type PageControllerI interface {
 
 type PageController struct {
 	service services.PageServiceI
+	validate *validator.Validate
 }
 
-func NewPageController(service services.PageServiceI) *PageController {
-	return &PageController{service: service}
+func NewPageController(service services.PageServiceI, validate *validator.Validate) *PageController {
+	return &PageController{
+		service: service, 
+		validate: validate,
+	}
 }
 
 // Ctx er res og req
