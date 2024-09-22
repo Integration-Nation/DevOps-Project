@@ -7,11 +7,13 @@ import (
 	"DevOps-Project/internal/repositories"
 	"DevOps-Project/internal/routes"
 	"DevOps-Project/internal/services"
+	"os"
+
+	"log"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	jwtware "github.com/gofiber/jwt/v3"
 )
 
 func init() {
@@ -24,19 +26,15 @@ func main() {
 	initializers.DB.AutoMigrate(&models.Page{})
 	initializers.DB.AutoMigrate(&models.User{})
 
-	    jwtSecret := os.Getenv("JWT_SECRET")
-        if jwtSecret == "" {
-        log.Fatal("JWT_SECRET environment variable not set")
-    }
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET environment variable not set")
+	}
 
 	app := fiber.New()
 	app.Use(cors.New())
 
 	v := validator.New()
-
-     app.Use("/api", jwtware.New(jwtware.Config{
-        SigningKey: []byte(jwtSecret),
-    }))
 
 	pageRepo := repositories.NewPageRepository(initializers.DB)
 	pageService := services.NewPageService(pageRepo)
@@ -50,7 +48,7 @@ func main() {
 	weatherController := controllers.NewWeatherController(weatherService)
 
 	routes.PageRoutes(app, pageController)
-	routes.UserRoutes(app, userController)
+	routes.UserRoutes(app, userController, jwtSecret)
 	routes.WeatherRoutes(app, weatherController)
 
 	app.Get("/", func(c *fiber.Ctx) error {

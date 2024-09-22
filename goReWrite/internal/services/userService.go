@@ -3,14 +3,15 @@ package services
 import (
 	"DevOps-Project/internal/models"
 	"DevOps-Project/internal/repositories"
-	"DevOps-Project/internal/utilities"
 	"DevOps-Project/internal/security"
+	"DevOps-Project/internal/utilities"
 	"errors"
+
 	"go.uber.org/zap"
 )
 
 type UserServiceI interface {
-	VerifyLogin(username, password string) (*models.User, error)
+	VerifyLogin(username, password string) (string, error)
 	GetAllUsers() *[]models.User
 	RegisterUser(username, email, password string) (*models.User, error)
 }
@@ -28,24 +29,24 @@ func NewUserService(repo repositories.UserRepositoryI) *UserService {
 }
 
 func (us *UserService) VerifyLogin(username, password string) (string, error) {
-		user, err:= us.repo.FindByUsername(username)
-		if err != nil {
-			us.logger.Error("Failed to find user by username", zap.Error(err))
-			return nil, errors.New("internal server error")
-		}
-		
-		if err:= security.ComparePasswords(user.Password, password); err != nil {
-			us.logger.Error("Failed to compare passwords", zap.Error(err))
-			return nil, errors.New("internal server error")
-		}
+	user, err := us.repo.FindByUsername(username)
+	if err != nil {
+		us.logger.Error("Failed to find user by username", zap.Error(err))
+		return "", errors.New("internal server error")
+	}
 
-		token, err := security.GenerateJWT(user.ID, user.Username)
-    if err != nil {
-        us.logger.Error("Failed to generate JWT token", zap.Error(err))
-        return "", errors.New("could not generate token")
-    }
+	if err := security.ComparePasswords(user.Password, password); err != nil {
+		us.logger.Error("Failed to compare passwords", zap.Error(err))
+		return "", errors.New("internal server error")
+	}
 
-		return token, nil
+	token, err := security.GenerateJWT(int(user.ID), user.Username)
+	if err != nil {
+		us.logger.Error("Failed to generate JWT token", zap.Error(err))
+		return "", errors.New("could not generate token")
+	}
+
+	return token, nil
 
 }
 
@@ -64,10 +65,10 @@ func (us *UserService) RegisterUser(username, email, password string) (*models.U
 	}
 
 	hashedPassword, err := security.HashPassword(password)
-    if err != nil {
-        us.logger.Error("Failed to hash password", zap.Error(err))
-        return nil, errors.New("internal server error")
-    }
+	if err != nil {
+		us.logger.Error("Failed to hash password", zap.Error(err))
+		return nil, errors.New("internal server error")
+	}
 
 	// Create the user
 	return us.repo.CreateUser(username, email, hashedPassword)
