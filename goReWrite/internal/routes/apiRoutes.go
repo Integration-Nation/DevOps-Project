@@ -9,7 +9,7 @@ import (
 
 func PageRoutes(app *fiber.App, pc controllers.PageControllerI) {
 	api := app.Group("/api")
-	api.Post("/search", pc.GetSearchResults)
+	api.Get("/search", pc.GetSearchResults)
 
 }
 
