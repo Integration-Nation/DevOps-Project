@@ -48,8 +48,9 @@ func main() {
 	weatherController := controllers.NewWeatherController(weatherService)
 
 	routes.PageRoutes(app, pageController)
-	routes.UserRoutes(app, userController, jwtSecret)
 	routes.WeatherRoutes(app, weatherController)
+	routes.UserRoutes(app, userController, jwtSecret)
+
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
