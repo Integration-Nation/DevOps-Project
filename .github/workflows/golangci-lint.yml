@@ -1,4 +1,5 @@
 name: golangci-lint
+
 on:
   push:
     branches:
@@ -24,8 +25,10 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
-      - name: golangci-lint
+
+      # Run golangci-lint with working directory
+      - name: Run golangci-lint
+        run: golangci-lint run
         working-directory: ./goRewrite
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: v1.60
+        env:
+          GOLANGCI_LINT_CACHE: ${{ runner.temp }}/golangci-lint-cache
