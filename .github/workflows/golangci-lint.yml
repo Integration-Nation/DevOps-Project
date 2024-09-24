@@ -9,8 +9,6 @@ on:
 
 permissions:
   contents: read
-  # Optional: allow read access to pull request. Use with `only-new-issues` option.
-  # pull-requests: read
 
 jobs:
   golangci:
@@ -26,9 +24,9 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
 
-      # Run golangci-lint with working directory
+      # Run golangci-lint inside the goRewrite directory using the action
       - name: Run golangci-lint
-        run: golangci-lint run
-        working-directory: goReWrite
-        env:
-          GOLANGCI_LINT_CACHE: ${{ runner.temp }}/golangci-lint-cache
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.60
+          working-directory: ./goRewrite
