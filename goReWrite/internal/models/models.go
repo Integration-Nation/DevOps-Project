@@ -29,6 +29,26 @@ type RegisterRequest struct {
 }
 
 type Weather struct {
-	Temperature int    `json:"temperature"`
-	Condition   string `json:"condition"`
+	Latitude             float64 `json:"latitude"`
+	Longitude            float64 `json:"longitude"`
+	GenerationTimeMs     float64 `json:"generationtime_ms"`
+	UtcOffsetSeconds     int     `json:"utc_offset_seconds"`
+	Timezone             string  `json:"timezone"`
+	TimeZoneAbbreviation string  `json:"timezone_abbreviation"`
+	Elevation            float64 `json:"elevation"`
+	Current              Current `json:"current"`
+	Hourly               Hourly  `json:"hourly"`
+}
+
+// Current represents the current weather data.
+type Current struct {
+	Time          string  `json:"time"`
+	Interval      int     `json:"interval"`
+	Temperature2m float64 `json:"temperature_2m"`
+}
+
+// Hourly represents the hourly weather data.
+type Hourly struct {
+	Time          []string  `json:"time"`
+	Temperature2m []float64 `json:"temperature_2m"`
 }

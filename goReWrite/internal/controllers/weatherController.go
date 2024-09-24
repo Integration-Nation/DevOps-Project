@@ -3,6 +3,7 @@ package controllers
 import (
 	"DevOps-Project/internal/services"
 	"DevOps-Project/internal/utilities"
+
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
@@ -16,27 +17,29 @@ type WeatherController struct {
 	logger  *zap.Logger
 }
 
-
 func NewWeatherController(service services.WeatherServiceI) *WeatherController {
 	return &WeatherController{
 		service: service,
-		logger: utilities.NewLogger(),
+		logger:  utilities.NewLogger(),
 	}
 }
 
 func (wc *WeatherController) GetWeather(c *fiber.Ctx) error {
+	defaultLatitude := "55.6761"
+	defaultLongitude := "12.5683"
 
-	// Get the weather data
-	weather, err := wc.service.GetWeather()
+	latitude := c.Query("latitude", defaultLatitude)
+	longitude := c.Query("longitude", defaultLongitude)
+
+	weather, err := wc.service.GetWeather(latitude, longitude)
 	if err != nil {
-		// Return an internal server error status with an error message in JSON
+
 		wc.logger.Error("Failed to get weather data", zap.Error(err))
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	// On success, return a JSON response with the weather data
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"weather": weather,
 	})
