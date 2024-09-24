@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+      - dev
   pull_request:
 
 permissions:
@@ -30,3 +31,4 @@ jobs:
         with:
           version: v1.60
           working-directory: ./goReWrite
+          args: --timeout=5m
