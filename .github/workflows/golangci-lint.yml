@@ -29,6 +29,6 @@ jobs:
       # Run golangci-lint with working directory
       - name: Run golangci-lint
         run: golangci-lint run
-        working-directory: ./goRewrite
+        working-directory: goRewrite
         env:
           GOLANGCI_LINT_CACHE: ${{ runner.temp }}/golangci-lint-cache
