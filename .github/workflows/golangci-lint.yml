@@ -25,6 +25,7 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - name: golangci-lint
+        working-directory: ./goRewrite
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.60
