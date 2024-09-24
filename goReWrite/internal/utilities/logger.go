@@ -14,6 +14,7 @@ func NewLogger() *zap.Logger {
 	fileEncoder := zapcore.NewJSONEncoder(encoderConfig)
 	logFile, err := os.OpenFile("app/logs/log.json", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0664)
 	if err != nil {
+		panic(err)
 	}
 
 	writer := zapcore.AddSync(logFile)
@@ -27,7 +28,7 @@ func NewLogger() *zap.Logger {
 	defer func(logger *zap.Logger) {
 		err := logger.Sync()
 		if err != nil {
-
+			logger.Error("error while syncing logger", zap.Error(err))
 		}
 	}(logger)
 

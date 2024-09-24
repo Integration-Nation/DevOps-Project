@@ -23,8 +23,13 @@ func init() {
 
 func main() {
 
-	initializers.DB.AutoMigrate(&models.Page{})
-	initializers.DB.AutoMigrate(&models.User{})
+	if err:= initializers.DB.AutoMigrate(&models.Page{}); err != nil {
+		log.Fatal(err)
+	} 
+	
+	 if err:= initializers.DB.AutoMigrate(&models.User{}); err != nil {
+		log.Fatal(err)
+	}
 
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {

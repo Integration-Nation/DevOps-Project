@@ -1,15 +1,15 @@
 name: golangci-lint
+
 on:
   push:
     branches:
       - main
       - master
+      - dev
   pull_request:
 
 permissions:
   contents: read
-  # Optional: allow read access to pull request. Use with `only-new-issues` option.
-  # pull-requests: read
 
 jobs:
   golangci:
@@ -24,8 +24,11 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
-      - name: golangci-lint
-        working-directory: ./goRewrite
+
+      # Run golangci-lint inside the goRewrite directory using the action
+      - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.60
+          working-directory: ./goReWrite
+          args: --timeout=5m
