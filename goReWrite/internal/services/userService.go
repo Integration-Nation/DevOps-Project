@@ -14,7 +14,7 @@ type UserServiceI interface {
 	VerifyLogin(username, password string) (string, error)
 	GetAllUsers() *[]models.User
 	RegisterUser(username, email, password string) (*models.User, error)
-	DeleteUser(username string) error
+	DeleteUser(username string) (string, error)
 }
 
 type UserService struct {
@@ -75,7 +75,12 @@ func (us *UserService) RegisterUser(username, email, password string) (*models.U
 	return us.repo.CreateUser(username, email, hashedPassword)
 }
 
-func (us *UserService) DeleteUser(username string) error {
-	us.repo.DeleteUser(username)
-	return nil
+func (us *UserService) DeleteUser(username string) (string, error) {
+	err := us.repo.DeleteUser(username)
+	if err != nil {
+		us.logger.Error("Failed to delete user", zap.Error(err))
+		return "", errors.New("internal server error")
+	}
+
+	return username + " has been deleted", nil
 }

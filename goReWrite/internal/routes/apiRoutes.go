@@ -17,7 +17,6 @@ func UserRoutes(app *fiber.App, uc controllers.UserControllerI, jwtSecret string
 	api := app.Group("/api")
 	api.Post("/register", uc.Register)
 	api.Post("/login", uc.Login)
-	api.Delete("/user", uc.DeleteUser)
 
 	app.Use("/api", jwtware.New(jwtware.Config{
 		SigningKey: []byte(jwtSecret),
@@ -25,6 +24,7 @@ func UserRoutes(app *fiber.App, uc controllers.UserControllerI, jwtSecret string
 
 	api.Get("/logout", uc.Logout)
 	api.Get("/users", uc.GetAllUsers)
+	api.Delete("/user", uc.DeleteUser)
 
 }
 
