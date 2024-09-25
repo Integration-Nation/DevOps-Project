@@ -23,11 +23,11 @@ func init() {
 
 func main() {
 
-	if err:= initializers.DB.AutoMigrate(&models.Page{}); err != nil {
+	if err := initializers.DB.AutoMigrate(&models.Page{}); err != nil {
 		log.Fatal(err)
-	} 
-	
-	 if err:= initializers.DB.AutoMigrate(&models.User{}); err != nil {
+	}
+
+	if err := initializers.DB.AutoMigrate(&models.User{}); err != nil {
 		log.Fatal(err)
 	}
 
@@ -56,13 +56,27 @@ func main() {
 	routes.WeatherRoutes(app, weatherController)
 	routes.UserRoutes(app, userController, jwtSecret)
 
-
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
 
-	err := app.Listen(":9090")
+	// Start HTTP server til omdirigering
+	go func() {
+		httpApp := fiber.New()
+		httpApp.Get("", func(c *fiber.Ctx) error {
+			return c.Redirect("https://"+c.Hostname()+c.OriginalURL(), fiber.StatusMovedPermanently)
+		})
+		log.Fatal(httpApp.Listen(":80"))
+	}()
+
+	// Start HTTPS server
+	err := app.ListenTLS(":9090", "/etc/letsencrypt/live/40-85-136-203.nip.io/fullchain.pem", "/etc/letsencrypt/live/40-85-136-203.nip.io/privkey.pem")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
+
+	// err := app.Listen(":9090")
+	// if err != nil {
+	// 	panic(err)
+	// }
 }
