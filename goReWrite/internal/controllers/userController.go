@@ -109,9 +109,10 @@ func (uc *UserController) Logout(c *fiber.Ctx) error {
 }
 
 func (uc *UserController) DeleteUser(c *fiber.Ctx) error {
-	err := uc.service.DeleteUser("admin")
+	username := c.Query("username")
+	response, err := uc.service.DeleteUser(username)
 	if err != nil {
 		return err
 	}
-	return nil
+	return c.SendString(response)
 }
