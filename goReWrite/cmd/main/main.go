@@ -60,15 +60,6 @@ func main() {
 		return c.SendString("Hello, World!")
 	})
 
-	// Start HTTP server til omdirigering
-	go func() {
-		httpApp := fiber.New()
-		httpApp.Get("", func(c *fiber.Ctx) error {
-			return c.Redirect("https://"+c.Hostname()+c.OriginalURL(), fiber.StatusMovedPermanently)
-		})
-		log.Fatal(httpApp.Listen(":80"))
-	}()
-
 	// Start HTTPS server
 	err := app.ListenTLS(":9090", "/etc/letsencrypt/live/40-85-136-203.nip.io/fullchain.pem", "/etc/letsencrypt/live/40-85-136-203.nip.io/privkey.pem")
 	if err != nil {
