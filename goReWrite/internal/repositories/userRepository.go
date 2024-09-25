@@ -12,6 +12,7 @@ type UserRepositoryI interface {
 	FindByUsername(username string) (*models.User, error)
 	GetAllUsers() *[]models.User
 	CreateUser(username, email, password string) (*models.User, error)
+	DeleteUser(username string) error
 }
 
 type UserRepository struct {
@@ -66,4 +67,17 @@ func (ur *UserRepository) CreateUser(username, email, password string) (*models.
 	// The user.ID is now populated after Create()
 	ur.logger.Info("User created successfully", zap.String("username", user.Username))
 	return &user, nil
+}
+
+// delete user by username
+func (ur *UserRepository) DeleteUser(username string) error {
+	var user models.User
+
+	result := ur.db.Where("username = ?", username).First(&user).Delete(&user)
+
+	if result.Error != nil {
+		ur.logger.Error("Error while deleting user by username", zap.Error(result.Error))
+		return result.Error
+	}
+	return nil
 }
