@@ -6,6 +6,7 @@ import (
 	"DevOps-Project/internal/security"
 	"DevOps-Project/internal/utilities"
 	"errors"
+	"time"
 
 	"go.uber.org/zap"
 )
@@ -15,17 +16,22 @@ type UserServiceI interface {
 	GetAllUsers() *[]models.User
 	RegisterUser(username, email, password string) (*models.User, error)
 	DeleteUser(username string) (string, error)
+	BlacklistToken(token string, duration time.Duration) error
+	IsTokenBlacklisted(token string) (bool, error)
+	Logout(token string) error
 }
 
 type UserService struct {
-	repo   repositories.UserRepositoryI
-	logger *zap.Logger
+	repo          repositories.UserRepositoryI
+	blackListRepo repositories.TokenBlacklistRepositoryI
+	logger        *zap.Logger
 }
 
-func NewUserService(repo repositories.UserRepositoryI) *UserService {
+func NewUserService(repo repositories.UserRepositoryI, blackListRepo repositories.TokenBlacklistRepositoryI) *UserService {
 	return &UserService{
-		repo:   repo,
-		logger: utilities.NewLogger(),
+		repo:          repo,
+		blackListRepo: blackListRepo,
+		logger:        utilities.NewLogger(),
 	}
 }
 
@@ -83,4 +89,16 @@ func (us *UserService) DeleteUser(username string) (string, error) {
 	}
 
 	return username + " has been deleted", nil
+}
+
+func (us *UserService) Logout(token string) error {
+	return us.BlacklistToken(token, time.Hour)
+}
+
+func (us *UserService) BlacklistToken(token string, duration time.Duration) error {
+	return us.blackListRepo.AddToken(token, duration)
+}
+
+func (us *UserService) IsTokenBlacklisted(token string) (bool, error) {
+	return us.blackListRepo.IsBlacklisted(token)
 }

@@ -4,6 +4,7 @@ import (
 	"DevOps-Project/internal/models"
 	"DevOps-Project/internal/services"
 	"DevOps-Project/internal/utilities"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -105,7 +106,27 @@ func (uc *UserController) Register(c *fiber.Ctx) error {
 }
 
 func (uc *UserController) Logout(c *fiber.Ctx) error {
-	return c.SendString("Logged Out")
+	authHeader := c.Get("Authorization")
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+
+	if token == "" {
+		uc.logger.Warn("No token provided in the Authorization header")
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "No token provided",
+		})
+	}
+
+	err := uc.service.Logout(token)
+	if err != nil {
+		uc.logger.Error("Error logging out user", zap.Error(err))
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Could not logout , please try again",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Successfully logged out",
+	})
 }
 
 func (uc *UserController) DeleteUser(c *fiber.Ctx) error {

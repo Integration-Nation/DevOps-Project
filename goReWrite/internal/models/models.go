@@ -52,3 +52,9 @@ type Hourly struct {
 	Time          []string  `json:"time"`
 	Temperature2m []float64 `json:"temperature_2m"`
 }
+
+type TokenBlacklist struct {
+	ID        uint      `gorm:"primaryKey"`
+	Token     string    `gorm:"uniqueIndex"`
+	ExpiresAt time.Time `gorm:"not null"`
+}
