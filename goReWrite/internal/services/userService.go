@@ -11,7 +11,7 @@ import (
 )
 
 type UserServiceI interface {
-	VerifyLogin(username, password string) (string, error)
+	VerifyLogin(username, password string) (string, string, error)
 	GetAllUsers() *[]models.User
 	RegisterUser(username, email, password string) (*models.User, error)
 	DeleteUser(username string) (string, error)
@@ -29,25 +29,25 @@ func NewUserService(repo repositories.UserRepositoryI) *UserService {
 	}
 }
 
-func (us *UserService) VerifyLogin(username, password string) (string, error) {
+func (us *UserService) VerifyLogin(username, password string) (string, string, error) {
 	user, err := us.repo.FindByUsername(username)
 	if err != nil {
 		us.logger.Error("Failed to find user by username", zap.Error(err))
-		return "", errors.New("internal server error")
+		return "", "", errors.New("internal server error")
 	}
 
 	if err := security.ComparePasswords(user.Password, password); err != nil {
 		us.logger.Error("Failed to compare passwords", zap.Error(err))
-		return "", errors.New("internal server error")
+		return "", "", errors.New("internal server error")
 	}
 
 	token, err := security.GenerateJWT(int(user.ID), user.Username)
 	if err != nil {
 		us.logger.Error("Failed to generate JWT token", zap.Error(err))
-		return "", errors.New("could not generate token")
+		return "", "", errors.New("could not generate token")
 	}
 
-	return token, nil
+	return token, user.Username, nil
 
 }
 
