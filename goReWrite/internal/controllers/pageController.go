@@ -27,7 +27,16 @@ func NewPageController(service services.PageServiceI, validate *validator.Valida
 	}
 }
 
-// Ctx er res og req
+// GetSearchResults godoc
+// @Summary Get search results
+// @Description Get search results from the service based on a query and language parameter
+// @Tags search
+// @Produce json
+// @Param q query string true "Search query"
+// @Param language query string false "Language of the results, default is 'en'" default(en)
+// @Success 200 {object} map[string]interface{} "List of search results"
+// @Failure 500 {object} map[string]interface{} "Internal Server Error"
+// @Router /search [get]
 func (pc *PageController) GetSearchResults(c *fiber.Ctx) error {
 	q := c.Query("q")
 	language := c.Query("language", "en")

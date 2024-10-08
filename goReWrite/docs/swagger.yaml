@@ -1,0 +1,205 @@
+basePath: /
+definitions:
+  models.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+host: localhost:9090
+info:
+  contact: {}
+  description: This is a search engine API for managing users and pages.
+  title: whoKnows-goFiber
+  version: 0.5.0
+paths:
+  /search:
+    get:
+      description: Get search results from the service based on a query and language
+        parameter
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        required: true
+        type: string
+      - default: en
+        description: Language of the results, default is 'en'
+        in: query
+        name: language
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of search results
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get search results
+      tags:
+      - search
+  /users:
+    delete:
+      description: Delete a user by username
+      parameters:
+      - description: Username of the user to delete
+        in: query
+        name: username
+        required: true
+        type: string
+      responses:
+        "200":
+          description: User deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid username
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a user
+      tags:
+      - users
+    get:
+      description: Retrieve a list of all registered users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all users
+      tags:
+      - users
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with username and password, and return a token
+      parameters:
+      - description: Login request
+        in: body
+        name: loginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token and username
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request format or validation errors
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized, wrong credentials
+          schema:
+            additionalProperties: true
+            type: object
+      summary: User login
+      tags:
+      - users
+  /users/logout:
+    post:
+      description: Logout the authenticated user
+      responses:
+        "200":
+          description: Logged Out
+          schema:
+            type: string
+      summary: Logout user
+      tags:
+      - users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with username, email, and password
+      parameters:
+      - description: Register request
+        in: body
+        name: registerRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request format or validation errors
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
+      tags:
+      - users
+  /weather:
+    get:
+      consumes:
+      - application/json
+      description: Fetch weather information based on latitude and longitude. Defaults
+        to Copenhagen if no query parameters are provided.
+      parameters:
+      - default: "55.6761"
+        description: Latitude of the location
+        in: query
+        name: latitude
+        type: string
+      - default: "12.5683"
+        description: Longitude of the location
+        in: query
+        name: longitude
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns weather data
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get weather data for a given location
+      tags:
+      - weather
+swagger: "2.0"
