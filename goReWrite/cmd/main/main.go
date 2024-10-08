@@ -1,3 +1,9 @@
+// @title whoKnows-goFiber
+// @version 0.5.0
+// @description This is a search engine API for managing users and pages.
+// @host localhost:9090
+// @BasePath /
+
 package main
 
 import (
