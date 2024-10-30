@@ -34,7 +34,6 @@ func (ur *UserRepository) FindByUsername(username string) (*models.User, error) 
 	result := ur.db.Where("username = ?", username).First(&user)
 
 	if result.Error != nil {
-		ur.logger.Error("Error while fetching user by username", zap.Error(result.Error))
 		return nil, result.Error
 	}
 	return &user, nil
