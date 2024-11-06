@@ -1,5 +1,46 @@
 # .github/workflows/deployment.yaml
-name: Docker Compose Workflow
+# name: Docker Compose Workflow
+
+# on:
+#   push:
+#     branches:
+#       - main
+#   workflow_dispatch:
+
+# jobs:
+#   deploy:
+#     name: Deploy
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+
+#       - name: Setup SSH
+#         uses: webfactory/ssh-agent@v0.5.3
+#         with:
+#           ssh-private-key: ${{ secrets.PRIVATE_KEY }}
+
+#       - name: SSH Command
+#         run: |
+#           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '
+#             cd ./${{ secrets.WORK_DIR }} &&
+#             git pull https://github.com/Integration-Nation/DevOps-Project.git &&
+#             cd goReWrite
+#             pwd &&
+#             ls -a &&
+
+#             # Stop and remove existing containers
+#             sudo docker-compose down &&
+
+#             # Remove the specific Docker image for the app service
+#             sudo docker rmi gorewrite_app &&
+
+#             # Build and start new containers
+#             sudo docker-compose up -d &&  sudo docker image prune -f
+#           '
+
+name: Deploy Workflow
 
 on:
   push:
@@ -8,14 +49,35 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
-    name: Deploy
+  build_and_push:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.PAT }}
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg DATABASE_PATH=${{ secrets.DATABASE_PATH }} \
+            --build-arg DB_URL=${{ secrets.DB_URL }} \
+            --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -t ghcr.io/integration-nation/devops-project:latest \
+            -f goReWrite/Dockerfile goReWrite
+
+      - name: Push Docker image
+        run: docker push ghcr.io/integration-nation/devops-project:latest
+
+  deploy:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    steps:
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
@@ -25,17 +87,8 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '
             cd ./${{ secrets.WORK_DIR }} &&
-            git pull https://github.com/Integration-Nation/DevOps-Project.git &&
-            cd goReWrite
+            cd DevOps-Frontend &&
             pwd &&
             ls -a &&
-            
-            # Stop and remove existing containers
-            sudo docker-compose down &&
-            
-            # Remove the specific Docker image for the app service
-            sudo docker rmi gorewrite_app &&
-            
-            # Build and start new containers
-            sudo docker-compose up -d &&  sudo docker image prune -f 
+            sudo docker-compose down && sudo docker-compose pull && sudo docker-compose up -d && sudo docker image prune -f
           '
