@@ -38,8 +38,13 @@ WORKDIR /root/
 # Copy the pre-built binary file from the previous stage
 COPY --from=builder /app/main .
 
-# Verify the binary file is copied correctly
-RUN ls -l /root/
+# Set environment variables in the final stage
+ARG DB_URL
+ARG DATABASE_PATH
+ARG JWT_SECRET
+ENV DB_URL=${DB_URL}
+ENV DATABASE_PATH=${DATABASE_PATH}
+ENV JWT_SECRET=${JWT_SECRET}
 
 # Command to run the executable
 CMD ["./main"]
