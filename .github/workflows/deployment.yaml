@@ -69,7 +69,7 @@ jobs:
             --build-arg DB_URL=${{ secrets.DB_URL }} \
             --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -t ghcr.io/integration-nation/devops-project:latest \
-            -f goReWrite/Dockerfile .
+            -f goReWrite/Dockerfile goReWrite
 
       - name: Push Docker image
         run: docker push ghcr.io/integration-nation/devops-project:latest
