@@ -38,9 +38,6 @@ WORKDIR /root/
 # Copy the pre-built binary file from the previous stage
 COPY --from=builder /app/main .
 
-# Copy the .env file
-COPY --from=builder /app/.env .
-
 # Verify the binary file is copied correctly
 RUN ls -l /root/
 
