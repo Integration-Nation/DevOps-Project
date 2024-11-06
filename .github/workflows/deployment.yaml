@@ -64,7 +64,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker buildx build  \
+          docker build \
             --build-arg DATABASE_PATH=${{ secrets.DATABASE_PATH }} \
             --build-arg DB_URL=${{ secrets.DB_URL }} \
             --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
