@@ -12,13 +12,18 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U integrationNation"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - mynetwork
   app:
     build: .
     depends_on:
-      - db
-    restart: unless-stopped
+      db:
+        condition: service_healthy
     command: ["./main"]
     ports:
       - "9090:9090"
