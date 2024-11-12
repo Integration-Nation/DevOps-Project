@@ -36,6 +36,8 @@ func MigrateUsers() {
 			fmt.Println("Fejl ved indsættelse af data i PostgreSQL for bruger:", user.Username, err)
 		}
 	}
+
+	fmt.Println("users migrated")
 }
 
 func MigratePages() {
@@ -51,4 +53,6 @@ func MigratePages() {
 			fmt.Println("Fejl ved indsættelse af data i PostgreSQL for side:", page.Title, err)
 		}
 	}
+
+	fmt.Println("pages migrated")
 }
