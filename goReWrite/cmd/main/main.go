@@ -25,8 +25,7 @@ import (
 func init() {
 	initializers.LoadEnv()
 	initializers.ConnectDB()
-	initializers.ConnectSQLite()
-
+	initializers.ConnectSqlite()
 }
 
 func main() {

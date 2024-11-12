@@ -9,12 +9,12 @@ import (
 	"gorm.io/gorm"
 )
 
-var SQLiteDB *gorm.DB
+var SqliteDB *gorm.DB
 
-func ConnectSQLite() {
+func ConnectSqlite() {
 	var err error
 	dsn := os.Getenv("DATABASE_PATH")
-	SQLiteDB, err = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
+	SqliteDB, err = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		panic("failed to connect database")
@@ -26,9 +26,11 @@ func ConnectSQLite() {
 func MigrateUsers() {
 	var users []models.User
 
-	if err := DB.Find(&users).Error; err != nil {
+	if err := SqliteDB.Find(&users).Error; err != nil {
 		fmt.Println("AutoMigrate Error: ", err)
 	}
+
+	fmt.Println("AutoMigrate: ", len(users))
 
 	for _, user := range users {
 		fmt.Println("AutoMigrate: ", user)
@@ -43,9 +45,11 @@ func MigrateUsers() {
 func MigratePages() {
 	var pages []models.Page
 
-	if err := DB.Find(&pages).Error; err != nil {
+	if err := SqliteDB.Find(&pages).Error; err != nil {
 		fmt.Println("AutoMigrate Error: ", err)
 	}
+
+	fmt.Println("AutoMigrate: ", len(pages))
 
 	for _, page := range pages {
 		fmt.Println("AutoMigrate: ", page)
