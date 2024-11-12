@@ -25,6 +25,9 @@ import (
 func init() {
 	// initializers.LoadEnv()
 	initializers.ConnectDB()
+	initializers.ConnectSQLite()
+	initializers.MigrateUsers()
+	initializers.MigratePages()
 }
 
 func main() {

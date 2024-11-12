@@ -1,8 +1,24 @@
 version: "3.8"
 
 services:
+  db:
+    image: postgres:latest
+    environment:
+      # - POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+      # - POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+      # - POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+      # - POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
   app:
     build: .
+    depends_on:
+      - db
+    restart: unless-stopped
     command: ["./main"]
     ports:
       - "9090:9090"
@@ -12,3 +28,11 @@ services:
       - /etc/letsencrypt/archive/40-85-136-203.nip.io:/etc/letsencrypt/archive/40-85-136-203.nip.io
     environment:
       - DATABASE_PATH=/app/data/whoknows.db
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
+volumes:
+  postgres_data:
