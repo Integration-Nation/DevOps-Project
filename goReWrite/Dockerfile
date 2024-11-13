@@ -13,9 +13,6 @@ RUN go mod download
 # Copy the source code into the container
 COPY . .
 
-# Copy the .env file if it exists
-COPY .env .env
-
 # Set the environment variables from the build arguments
 ARG DATABASE_PATH
 ARG JWT_SECRET
