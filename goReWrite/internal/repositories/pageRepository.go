@@ -23,7 +23,6 @@ func NewPageRepository(db *gorm.DB) *PageRepository {
 		db:     db,
 		logger: utilities.NewLogger(),
 	}
-
 }
 
 func (pr *PageRepository) GetSearchResults(q string, language string) ([]models.Page, error) {

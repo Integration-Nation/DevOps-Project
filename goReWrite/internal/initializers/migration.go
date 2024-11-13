@@ -33,7 +33,7 @@ func MigrateUsers() {
 	fmt.Println("AutoMigrate: ", len(users))
 
 	for _, user := range users {
-		fmt.Println("AutoMigrate: ", user)
+		fmt.Println("AutoMigrate: ", user.Username)
 		if err := DB.Create(&user).Error; err != nil {
 			fmt.Println("Fejl ved indsættelse af data i PostgreSQL for bruger:", user.Username, err)
 		}
@@ -52,7 +52,7 @@ func MigratePages() {
 	fmt.Println("AutoMigrate: ", len(pages))
 
 	for _, page := range pages {
-		fmt.Println("AutoMigrate: ", page)
+		fmt.Println("AutoMigrate: ", page.Title)
 		if err := DB.Create(&page).Error; err != nil {
 			fmt.Println("Fejl ved indsættelse af data i PostgreSQL for side:", page.Title, err)
 		}
