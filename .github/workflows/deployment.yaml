@@ -66,8 +66,8 @@ jobs:
         run: |
           docker build \
             --build-arg DATABASE_PATH=${{ secrets.DATABASE_PATH }} \
-            --build-arg DB_URL=${{ secrets.DB_URL }} \
             --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            --build-arg POSTGRES_DB_URL=${{ secrets.POSTGRES_DB_URL }} \
             -t ghcr.io/integration-nation/devops-project:latest \
             -f goReWrite/Dockerfile goReWrite
 
