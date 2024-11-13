@@ -41,7 +41,7 @@ func (us *UserService) VerifyLogin(username, password string) (string, string, e
 		return "", "", errors.New("internal server error")
 	}
 
-	token, err := security.GenerateJWT(int(user.ID), user.Username)
+	token, err := security.GenerateJWT(user.ID, user.Username)
 	if err != nil {
 		us.logger.Error("Failed to generate JWT token", zap.Error(err))
 		return "", "", errors.New("could not generate token")

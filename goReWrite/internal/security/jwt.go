@@ -6,10 +6,11 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 )
 
 // GenerateJWT generates a new JWT token for a given user ID and username.
-func GenerateJWT(userID int, username string) (string, error) {
+func GenerateJWT(userID uuid.UUID, username string) (string, error) {
 	// Get the JWT secret from environment variables
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
