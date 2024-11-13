@@ -71,15 +71,15 @@ func main() {
 	})
 
 	//Start HTTPS server
-	// 	err := app.ListenTLS(":9090", "/etc/letsencrypt/live/40-85-136-203.nip.io/fullchain.pem", "/etc/letsencrypt/live/40-85-136-203.nip.io/privkey.pem")
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-
-	// }
-
-	err := app.Listen(":9090")
+	err := app.ListenTLS(":9090", "/etc/letsencrypt/live/40-85-136-203.nip.io/fullchain.pem", "/etc/letsencrypt/live/40-85-136-203.nip.io/privkey.pem")
 	if err != nil {
 		panic(err)
 	}
+
 }
+
+// 	err := app.Listen(":9090")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }
