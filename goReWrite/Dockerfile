@@ -16,15 +16,15 @@ COPY . .
 # Copy the .env file if it exists
 COPY .env .env
 
-# # Set the environment variables from the build arguments
-# ARG DB_URL
-# ARG DATABASE_PATH
-# ARG JWT_SECRET
+# Set the environment variables from the build arguments
+ARG DATABASE_PATH
+ARG JWT_SECRET
+ARG POSTGRES_DB_URL
 
 # # Use the build arguments to set environment variables inside the container
-# ENV DB_URL=${DB_URL}
-# ENV DATABASE_PATH=${DATABASE_PATH}
-# ENV JWT_SECRET=${JWT_SECRET}
+ENV DATABASE_PATH=${DATABASE_PATH}
+ENV JWT_SECRET=${JWT_SECRET}
+ENV POSTGRES_DB_URL=${POSTGRES_DB_URL}
 
 # Build the Go app
 RUN go build -o main ./cmd/main
@@ -41,16 +41,13 @@ WORKDIR /root/
 # Copy the pre-built binary file from the previous stage
 COPY --from=builder /app/main .
 
-# Copy the .env file
-COPY --from=builder /app/.env .
-
-# # Set environment variables in the final stage
-# ARG DB_URL
-# ARG DATABASE_PATH
-# ARG JWT_SECRET
-# ENV DB_URL=${DB_URL}
-# ENV DATABASE_PATH=${DATABASE_PATH}
-# ENV JWT_SECRET=${JWT_SECRET}
+# Set environment variables in the final stage
+ARG DATABASE_PATH
+ARG JWT_SECRET
+ARG POSTGRES_DB_URL
+ENV DATABASE_PATH=${DATABASE_PATH}
+ENV JWT_SECRET=${JWT_SECRET}
+ENV POSTGRES_DB_URL=${POSTGRES_DB_URL}
 
 # Command to run the executable
 CMD ["./main"]
