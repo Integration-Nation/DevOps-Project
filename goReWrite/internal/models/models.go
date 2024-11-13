@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Page struct {
 	Title       string    `gorm:"type:text" json:"title"`
@@ -11,10 +15,10 @@ type Page struct {
 }
 
 type User struct {
-	ID       uint   `gorm:"primaryKey" json:"id"`
-	Username string `gorm:"unique" json:"username"`
-	Email    string `gorm:"unique" json:"email"`
-	Password string `json:"password"`
+	ID       uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	Username string    `gorm:"unique" json:"username"`
+	Email    string    `gorm:"unique" json:"email"`
+	Password string    `json:"password"`
 }
 
 type LoginRequest struct {

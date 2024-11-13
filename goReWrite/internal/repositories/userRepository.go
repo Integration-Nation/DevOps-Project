@@ -4,6 +4,7 @@ import (
 	"DevOps-Project/internal/models"
 	"DevOps-Project/internal/utilities"
 
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -51,6 +52,7 @@ func (ur *UserRepository) GetAllUsers() *[]models.User {
 
 func (ur *UserRepository) CreateUser(username, email, password string) (*models.User, error) {
 	user := models.User{
+		ID:       uuid.New(),
 		Username: username,
 		Email:    email,
 		Password: password, // Storing password as plain text for now (not recommended in production)
