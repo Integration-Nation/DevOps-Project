@@ -25,7 +25,7 @@ import (
 func init() {
 	//initializers.LoadEnv()
 	initializers.ConnectDB()
-	initializers.ConnectSqlite()
+	//initializers.ConnectSqlite()
 }
 
 func main() {
@@ -39,7 +39,7 @@ func main() {
 	}
 
 	// initializers.MigrateUsers()
-	initializers.MigratePages()
+	//initializers.MigratePages()
 
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
