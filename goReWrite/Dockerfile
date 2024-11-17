@@ -13,17 +13,17 @@ RUN go mod download
 # Copy the source code into the container
 COPY . .
 
-COPY .env .env
+# COPY .env .env
 
 # Set the environment variables from the build arguments
-# ARG DATABASE_PATH
-# ARG JWT_SECRET
-# ARG POSTGRES_DB_URL
+ARG DATABASE_PATH
+ARG JWT_SECRET
+ARG POSTGRES_DB_URL
 
-# # Use the build arguments to set environment variables inside the container
-# ENV DATABASE_PATH=${DATABASE_PATH}
-# ENV JWT_SECRET=${JWT_SECRET}
-# ENV POSTGRES_DB_URL=${POSTGRES_DB_URL}
+# Use the build arguments to set environment variables inside the container
+ENV DATABASE_PATH=${DATABASE_PATH}
+ENV JWT_SECRET=${JWT_SECRET}
+ENV POSTGRES_DB_URL=${POSTGRES_DB_URL}
 
 # Build the Go app
 RUN go build -o main ./cmd/main
@@ -41,15 +41,15 @@ WORKDIR /root/
 COPY --from=builder /app/main .
 
 
-COPY --from=builder /app/.env .
+# COPY --from=builder /app/.env .
 
 # Set environment variables in the final stage
-# ARG DATABASE_PATH
-# ARG JWT_SECRET
-# ARG POSTGRES_DB_URL
-# ENV DATABASE_PATH=${DATABASE_PATH}
-# ENV JWT_SECRET=${JWT_SECRET}
-# ENV POSTGRES_DB_URL=${POSTGRES_DB_URL}
+ARG DATABASE_PATH
+ARG JWT_SECRET
+ARG POSTGRES_DB_URL
+ENV DATABASE_PATH=${DATABASE_PATH}
+ENV JWT_SECRET=${JWT_SECRET}
+ENV POSTGRES_DB_URL=${POSTGRES_DB_URL}
 
 # Command to run the executable
 CMD ["./main"]
