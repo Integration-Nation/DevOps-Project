@@ -29,8 +29,8 @@ services:
       - "9090:9090"
     volumes:
       - .:/app
-      - /etc/letsencrypt/live/40-85-136-203.nip.io:/etc/letsencrypt/live/40-85-136-203.nip.io
-      - /etc/letsencrypt/archive/40-85-136-203.nip.io:/etc/letsencrypt/archive/40-85-136-203.nip.io
+      - /etc/letsencrypt/live/integration-nation.dk:/etc/letsencrypt/live/integration-nation.dk
+      - /etc/letsencrypt/archive/integration-nation.dk:/etc/letsencrypt/archive/integration-nation.dk
     environment:
       - DATABASE_PATH=/app/data/whoknows.db
     networks:
