@@ -17,13 +17,14 @@ import (
 
 	"log"
 
+	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func init() {
-	//initializers.LoadEnv()
+	initializers.LoadEnv()
 	initializers.ConnectDB()
 	//initializers.ConnectSqlite()
 }
@@ -49,6 +50,11 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New())
 
+	prometheus := fiberprometheus.New("WhoKnows-goFiber")
+	prometheus.RegisterAt(app, "/metrics")
+	prometheus.SetSkipPaths([]string{"/ping"})
+	app.Use(prometheus.Middleware)
+
 	v := validator.New()
 
 	pageRepo := repositories.NewPageRepository(initializers.DB)
@@ -71,15 +77,15 @@ func main() {
 	})
 
 	//Start HTTPS server
-	err := app.ListenTLS(":9090", "/etc/letsencrypt/live/40-85-136-203.nip.io/fullchain.pem", "/etc/letsencrypt/live/40-85-136-203.nip.io/privkey.pem")
+	// err := app.ListenTLS(":9090", "/etc/letsencrypt/live/40-85-136-203.nip.io/fullchain.pem", "/etc/letsencrypt/live/40-85-136-203.nip.io/privkey.pem")
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// }
+
+	err := app.Listen(":9090")
 	if err != nil {
 		panic(err)
 	}
-
 }
-
-// 	err := app.Listen(":9090")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
