@@ -17,13 +17,14 @@ import (
 
 	"log"
 
+	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func init() {
-	//initializers.LoadEnv()
+	// initializers.LoadEnv()
 	initializers.ConnectDB()
 	//initializers.ConnectSqlite()
 }
@@ -48,6 +49,11 @@ func main() {
 
 	app := fiber.New()
 	app.Use(cors.New())
+
+	prometheus := fiberprometheus.New("WhoKnows-goFiber")
+	prometheus.RegisterAt(app, "/metrics")
+	prometheus.SetSkipPaths([]string{"/ping"})
+	app.Use(prometheus.Middleware)
 
 	v := validator.New()
 

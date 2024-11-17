@@ -1,25 +1,11 @@
 {
   "sqltools.connections": [
     {
-      "mysqlOptions": {
-        "authProtocol": "default",
-        "enableSsl": "Disabled"
-      },
       "previewLimit": 50,
       "server": "localhost",
-      "port": 3306,
-      "driver": "MySQL",
-      "name": "whoknows_test",
-      "database": "libra",
-      "username": "root",
-      "password": "ubuntuskole"
-    },
-    {
-      "previewLimit": 50,
-      "server": "localhost",
-      "port": 5432,
+      "port": 7000,
       "driver": "PostgreSQL",
-      "name": "who",
+      "name": "WhoKnows",
       "database": "whoKnowsDB",
       "username": "integrationNation",
       "password": "hoeHoeHoe69"
