@@ -14,6 +14,7 @@ import (
 	"DevOps-Project/internal/repositories"
 	"DevOps-Project/internal/routes"
 	"DevOps-Project/internal/services"
+	"fmt"
 	"os"
 
 	"log"
@@ -22,10 +23,12 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/mem"
 )
 
 func init() {
-	initializers.LoadEnv()
+	// initializers.LoadEnv()
 	initializers.ConnectDB()
 	//initializers.ConnectSqlite()
 }
@@ -59,23 +62,31 @@ func main() {
 	app.Use(prometheus.Middleware)
 
 	app.Use(func(c *fiber.Ctx) error {
-	monitoring.ConcurrentRequests.Inc() // Increment concurrent requests
-	defer monitoring.ConcurrentRequests.Dec() // Decrement when done
+		monitoring.ConcurrentRequests.Inc()       // Increment concurrent requests
+		defer monitoring.ConcurrentRequests.Dec() // Decrement when done
 
-	return c.Next()
-})
+		return c.Next()
+	})
 
-app.Use(func(c *fiber.Ctx) error {
-	if err := c.Next(); err != nil {
-		monitoring.TotalErrors.Inc() // Increment error count
-		return err
+	cpuPercent, erri := cpu.Percent(0, false)
+	if erri != nil {
+		log.Fatal("error getting CPU percent", erri)
 	}
-	return nil
-})
+	fmt.Println("CPU Percent:", cpuPercent)
 
+	vm, erro := mem.VirtualMemory()
+	if erro != nil {
+		log.Fatal("error getting memory usage", erro)
+	}
+	fmt.Println("Memory Usage:", vm.Used)
 
-
-
+	app.Use(func(c *fiber.Ctx) error {
+		if err := c.Next(); err != nil {
+			monitoring.TotalErrors.Inc() // Increment error count
+			return err
+		}
+		return nil
+	})
 
 	v := validator.New()
 
@@ -98,16 +109,16 @@ app.Use(func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
 
-	//Start HTTPS server
-// 	err := app.ListenTLS(":9090", "/etc/letsencrypt/live/40-85-136-203.nip.io/fullchain.pem", "/etc/letsencrypt/live/40-85-136-203.nip.io/privkey.pem")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// }
-
-	err := app.Listen(":9090")
+	// Start HTTPS server
+	err := app.ListenTLS(":9090", "/etc/letsencrypt/live/40-85-136-203.nip.io/fullchain.pem", "/etc/letsencrypt/live/40-85-136-203.nip.io/privkey.pem")
 	if err != nil {
 		panic(err)
 	}
+
 }
+
+// 	err := app.Listen(":9090")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }

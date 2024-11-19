@@ -50,7 +50,7 @@ var (
 )
 
 func init() {
-	prometheus.MustRegister(ConcurrentRequests, TotalErrors)
+	prometheus.MustRegister(ConcurrentRequests, TotalErrors, diskUsage, memoryUsage, cpuUsage)
 }
 
 func CollectSystemMetrics() {
@@ -71,7 +71,7 @@ func CollectSystemMetrics() {
 			log.Println("Error collecting disk metrics:", err)
 		}
 
-				// Collect CPU usage
+		// Collect CPU usage
 		percentages, err := cpu.Percent(0, false) // Aggregate CPU usage (false: overall usage, not per core)
 		if err == nil && len(percentages) > 0 {
 			cpuUsage.Set(percentages[0]) // Use the first value for overall CPU usage
