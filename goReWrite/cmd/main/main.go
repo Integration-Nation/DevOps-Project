@@ -25,7 +25,7 @@ import (
 )
 
 func init() {
-	// initializers.LoadEnv()
+	initializers.LoadEnv()
 	initializers.ConnectDB()
 	//initializers.ConnectSqlite()
 }
@@ -88,15 +88,15 @@ func main() {
 
 
 	//Start HTTPS server
-	err := app.ListenTLS(":9090", "/etc/letsencrypt/live/integration-nation.dk/fullchain.pem", "/etc/letsencrypt/live/integration-nation.dk/privkey.pem")
+// 	err := app.ListenTLS(":9090", "/etc/letsencrypt/live/integration-nation.dk/fullchain.pem", "/etc/letsencrypt/live/integration-nation.dk/privkey.pem")
   
-	if err != nil {
-		panic(err)
-	}
-}
-
-// 	err := app.Listen(":9090")
 // 	if err != nil {
 // 		panic(err)
 // 	}
 // }
+
+	err := app.Listen(":9090")
+	if err != nil {
+		panic(err)
+	}
+}
