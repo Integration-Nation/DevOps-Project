@@ -10,6 +10,7 @@ import (
 	"DevOps-Project/internal/controllers"
 	"DevOps-Project/internal/initializers"
 	"DevOps-Project/internal/models"
+	"DevOps-Project/internal/monitoring"
 	"DevOps-Project/internal/repositories"
 	"DevOps-Project/internal/routes"
 	"DevOps-Project/internal/services"
@@ -50,10 +51,19 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New())
 
+	go monitoring.CollectSystemMetrics()
+
 	prometheus := fiberprometheus.New("WhoKnows-goFiber")
 	prometheus.RegisterAt(app, "/metrics")
 	prometheus.SetSkipPaths([]string{"/ping"})
 	app.Use(prometheus.Middleware)
+
+	app.Use(func(c *fiber.Ctx) error {
+		monitoring.ConcurrentRequests.Inc()       // Increment concurrent requests
+		defer monitoring.ConcurrentRequests.Dec() // Decrement when done
+
+		return c.Next()
+	})
 
 	v := validator.New()
 
@@ -76,8 +86,10 @@ func main() {
 		return c.SendString("Hello, World!")
 	})
 
+
 	//Start HTTPS server
 	err := app.ListenTLS(":9090", "/etc/letsencrypt/live/integration-nation.dk/fullchain.pem", "/etc/letsencrypt/live/integration-nation.dk/privkey.pem")
+  
 	if err != nil {
 		panic(err)
 	}
