@@ -5,80 +5,129 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/mem"
 )
 
 var (
-	ConcurrentRequests = prometheus.NewGauge(
-		prometheus.GaugeOpts{
-			Name: "http_concurrent_requests",
-			Help: "Number of concurrent HTTP requests being processed.",
-		},
-	)
+	registry = prometheus.NewRegistry()
 
-	TotalErrors = prometheus.NewCounter(
-		prometheus.CounterOpts{
-			Name: "http_errors_total",
-			Help: "Total number of HTTP errors encountered.",
-		},
-	)
-)
-
-var (
-	diskUsage = prometheus.NewGaugeVec(
+	// System Metrics
+	SystemDiskUsage = promauto.With(registry).NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "disk_usage_bytes",
-			Help: "Disk usage in bytes.",
+			Namespace: "whoknows",
+			Name:      "system_disk_usage_bytes",
+			Help:      "Disk usage in bytes.",
 		},
 		[]string{"path"},
 	)
 
-	memoryUsage = prometheus.NewGauge(
+	SystemMemoryUsage = promauto.With(registry).NewGauge(
 		prometheus.GaugeOpts{
-			Name: "memory_usage_bytes",
-			Help: "Memory usage in bytes.",
+			Namespace: "whoknows",
+			Name:      "system_memory_usage_bytes",
+			Help:      "Memory usage in bytes.",
 		},
 	)
-	cpuUsage = prometheus.NewGauge(
+
+	SystemCPUUsage = promauto.With(registry).NewGauge(
 		prometheus.GaugeOpts{
-			Name: "cpu_usage_percent",
-			Help: "CPU usage percentage.",
+			Namespace: "whoknows",
+			Name:      "system_cpu_usage_percent",
+			Help:      "CPU usage percentage.",
 		},
+	)
+
+	// HTTP Metrics
+	HTTPConcurrentRequests = promauto.With(registry).NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: "whoknows",
+			Name:      "http_concurrent_requests",
+			Help:      "Number of concurrent HTTP requests being processed.",
+		},
+	)
+
+	HTTPTotalErrors = promauto.With(registry).NewCounter(
+		prometheus.CounterOpts{
+			Namespace: "whoknows",
+			Name:      "http_total_errors",
+			Help:      "Total number of HTTP errors encountered.",
+		},
+	)
+
+	TotalUsers = promauto.With(registry).NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: "whoknows",
+			Name:      "total_users",
+			Help:      "Total number of registered users.",
+		},
+	)
+
+	ActiveUsers = promauto.With(registry).NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: "whoknows",
+			Name:      "active_users",
+			Help:      "Number of active users in different time periods.",
+		},
+		[]string{"period"}, // period can be "daily", "weekly", "monthly"
 	)
 )
 
 func init() {
-	prometheus.MustRegister(ConcurrentRequests, TotalErrors, diskUsage, memoryUsage, cpuUsage)
+	// Register metrics with the default registry
+	prometheus.MustRegister(
+		SystemDiskUsage,
+		SystemMemoryUsage,
+		SystemCPUUsage,
+		HTTPConcurrentRequests,
+		HTTPTotalErrors,
+		TotalUsers,
+		ActiveUsers,
+	)
 }
 
 func CollectSystemMetrics() {
-	for {
-		// Collect memory usage
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		// Memory Usage
 		vm, err := mem.VirtualMemory()
-		if err == nil {
-			memoryUsage.Set(float64(vm.Used))
+		if err != nil {
+			log.Printf("Error collecting memory metrics: %v", err)
 		} else {
-			log.Println("Error collecting memory metrics:", err)
+			SystemMemoryUsage.Set(float64(vm.Used))
+			log.Printf("Memory Usage: %v bytes", vm.Used)
 		}
 
-		// Collect disk usage
+		// Disk Usage
 		usage, err := disk.Usage("/")
-		if err == nil {
-			diskUsage.WithLabelValues("/").Set(float64(usage.Used))
+		if err != nil {
+			log.Printf("Error collecting disk metrics: %v", err)
 		} else {
-			log.Println("Error collecting disk metrics:", err)
+			SystemDiskUsage.WithLabelValues("/").Set(float64(usage.Used))
+			log.Printf("Disk Usage: %v bytes", usage.Used)
 		}
 
-		// Collect CPU usage
-		percentages, err := cpu.Percent(0, false) // Aggregate CPU usage (false: overall usage, not per core)
-		if err == nil && len(percentages) > 0 {
-			cpuUsage.Set(percentages[0]) // Use the first value for overall CPU usage
-		} else {
-			log.Println("Error collecting CPU metrics:", err)
+		// CPU Usage
+		percentages, err := cpu.Percent(time.Second, false)
+		if err != nil {
+			log.Printf("Error collecting CPU metrics: %v", err)
+		} else if len(percentages) > 0 {
+			SystemCPUUsage.Set(percentages[0])
+			log.Printf("CPU Usage: %.2f%%", percentages[0])
 		}
-
-		time.Sleep(10 * time.Second) // Adjust collection interval as needed
 	}
+}
+
+// UpdateTotalUsers updates the total number of registered users
+func UpdateTotalUsers(count int) {
+	TotalUsers.Set(float64(count))
+}
+
+// UpdateActiveUsers updates the number of active users for a specific time period
+func UpdateActiveUsers(period string, count int) {
+	ActiveUsers.WithLabelValues(period).Set(float64(count))
 }

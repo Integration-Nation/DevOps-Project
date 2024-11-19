@@ -2,10 +2,12 @@ package services
 
 import (
 	"DevOps-Project/internal/models"
+	"DevOps-Project/internal/monitoring"
 	"DevOps-Project/internal/repositories"
 	"DevOps-Project/internal/security"
 	"DevOps-Project/internal/utilities"
 	"errors"
+	"time"
 
 	"go.uber.org/zap"
 )
@@ -15,6 +17,7 @@ type UserServiceI interface {
 	GetAllUsers() *[]models.User
 	RegisterUser(username, email, password string) (*models.User, error)
 	DeleteUser(username string) (string, error)
+	collectUserMetrics()
 }
 
 type UserService struct {
@@ -23,10 +26,13 @@ type UserService struct {
 }
 
 func NewUserService(repo repositories.UserRepositoryI) *UserService {
-	return &UserService{
+	service := &UserService{
 		repo:   repo,
 		logger: utilities.NewLogger(),
 	}
+
+	go service.collectUserMetrics()
+	return service
 }
 
 func (us *UserService) VerifyLogin(username, password string) (string, string, error) {
@@ -83,4 +89,38 @@ func (us *UserService) DeleteUser(username string) (string, error) {
 	}
 
 	return username + " has been deleted", nil
+}
+
+func (us *UserService) collectUserMetrics() {
+	ticker := time.NewTicker(5 * time.Minute)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		// Update total users
+		totalUsers, err := us.repo.CountTotal()
+		if err == nil {
+			monitoring.UpdateTotalUsers(totalUsers)
+		}
+
+		// Update active users for different periods
+		now := time.Now()
+
+		// Daily active users (last 24 hours)
+		dailyActive, err := us.repo.CountActiveUsers(now.Add(-24 * time.Hour))
+		if err == nil {
+			monitoring.UpdateActiveUsers("daily", dailyActive)
+		}
+
+		// Weekly active users (last 7 days)
+		weeklyActive, err := us.repo.CountActiveUsers(now.Add(-7 * 24 * time.Hour))
+		if err == nil {
+			monitoring.UpdateActiveUsers("weekly", weeklyActive)
+		}
+
+		// Monthly active users (last 30 days)
+		monthlyActive, err := us.repo.CountActiveUsers(now.Add(-30 * 24 * time.Hour))
+		if err == nil {
+			monitoring.UpdateActiveUsers("monthly", monthlyActive)
+		}
+	}
 }
