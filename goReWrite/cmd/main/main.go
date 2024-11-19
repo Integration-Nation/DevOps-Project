@@ -14,20 +14,28 @@ import (
 	"DevOps-Project/internal/repositories"
 	"DevOps-Project/internal/routes"
 	"DevOps-Project/internal/services"
+	"log"
 	"os"
 
-	"log"
-
-	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/valyala/fasthttp/fasthttpadaptor"
 )
 
 func init() {
 	initializers.LoadEnv()
 	initializers.ConnectDB()
 	//initializers.ConnectSqlite()
+}
+
+func prometheusHandler() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		handler := fasthttpadaptor.NewFastHTTPHandler(promhttp.Handler())
+		handler(c.Context())
+		return nil
+	}
 }
 
 func main() {
@@ -53,17 +61,22 @@ func main() {
 
 	go monitoring.CollectSystemMetrics()
 
-	prometheus := fiberprometheus.New("WhoKnows-goFiber")
-	prometheus.RegisterAt(app, "/metrics")
-	prometheus.SetSkipPaths([]string{"/ping"})
-	app.Use(prometheus.Middleware)
-
+	// Middleware for tracking concurrent requests and errors
 	app.Use(func(c *fiber.Ctx) error {
-		monitoring.ConcurrentRequests.Inc()       // Increment concurrent requests
-		defer monitoring.ConcurrentRequests.Dec() // Decrement when done
-
+		monitoring.HTTPConcurrentRequests.Inc()
+		defer monitoring.HTTPConcurrentRequests.Dec()
 		return c.Next()
 	})
+
+	app.Use(func(c *fiber.Ctx) error {
+		if err := c.Next(); err != nil {
+			monitoring.HTTPTotalErrors.Inc()
+			return err
+		}
+		return nil
+	})
+
+	app.Get("/metrics", prometheusHandler())
 
 	v := validator.New()
 
@@ -86,14 +99,13 @@ func main() {
 		return c.SendString("Hello, World!")
 	})
 
-
 	//Start HTTPS server
-// 	err := app.ListenTLS(":9090", "/etc/letsencrypt/live/integration-nation.dk/fullchain.pem", "/etc/letsencrypt/live/integration-nation.dk/privkey.pem")
-  
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
+	// 	err := app.ListenTLS(":9090", "/etc/letsencrypt/live/integration-nation.dk/fullchain.pem", "/etc/letsencrypt/live/integration-nation.dk/privkey.pem")
+
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// }
 
 	err := app.Listen(":9090")
 	if err != nil {
