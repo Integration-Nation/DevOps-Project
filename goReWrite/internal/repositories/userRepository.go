@@ -3,6 +3,7 @@ package repositories
 import (
 	"DevOps-Project/internal/models"
 	"DevOps-Project/internal/utilities"
+	"time"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -14,6 +15,8 @@ type UserRepositoryI interface {
 	GetAllUsers() *[]models.User
 	CreateUser(username, email, password string) (*models.User, error)
 	DeleteUser(username string) error
+	CountTotal() (int, error)
+	CountActiveUsers(since time.Time) (int, error)
 }
 
 type UserRepository struct {
@@ -81,4 +84,22 @@ func (ur *UserRepository) DeleteUser(username string) error {
 		return result.Error
 	}
 	return nil
+}
+
+//*MONITORING
+
+// CountTotal returns the total number of registered users
+func (ur *UserRepository) CountTotal() (int, error) {
+	var count int64
+	result := ur.db.Model(&models.User{}).Count(&count)
+	return int(count), result.Error
+}
+
+// CountActiveUsers returns the number of users active since the given time
+func (ur *UserRepository) CountActiveUsers(since time.Time) (int, error) {
+	var count int64
+	result := ur.db.Model(&models.User{}).
+		Where("last_login_at >= ?", since).
+		Count(&count)
+	return int(count), result.Error
 }

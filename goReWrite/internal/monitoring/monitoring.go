@@ -56,6 +56,23 @@ var (
 			Help:      "Total number of HTTP errors encountered.",
 		},
 	)
+
+	TotalUsers = promauto.With(registry).NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: "whoknows",
+			Name:      "total_users",
+			Help:      "Total number of registered users.",
+		},
+	)
+
+	ActiveUsers = promauto.With(registry).NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: "whoknows",
+			Name:      "active_users",
+			Help:      "Number of active users in different time periods.",
+		},
+		[]string{"period"}, // period can be "daily", "weekly", "monthly"
+	)
 )
 
 func init() {
@@ -66,6 +83,8 @@ func init() {
 		SystemCPUUsage,
 		HTTPConcurrentRequests,
 		HTTPTotalErrors,
+		TotalUsers,
+		ActiveUsers,
 	)
 }
 
@@ -101,4 +120,14 @@ func CollectSystemMetrics() {
 			log.Printf("CPU Usage: %.2f%%", percentages[0])
 		}
 	}
+}
+
+// UpdateTotalUsers updates the total number of registered users
+func UpdateTotalUsers(count int) {
+	TotalUsers.Set(float64(count))
+}
+
+// UpdateActiveUsers updates the number of active users for a specific time period
+func UpdateActiveUsers(period string, count int) {
+	ActiveUsers.WithLabelValues(period).Set(float64(count))
 }
