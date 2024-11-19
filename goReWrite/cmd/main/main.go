@@ -14,7 +14,6 @@ import (
 	"DevOps-Project/internal/repositories"
 	"DevOps-Project/internal/routes"
 	"DevOps-Project/internal/services"
-	"fmt"
 	"os"
 
 	"log"
@@ -23,8 +22,6 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/shirou/gopsutil/v3/cpu"
-	"github.com/shirou/gopsutil/v3/mem"
 )
 
 func init() {
@@ -66,26 +63,6 @@ func main() {
 		defer monitoring.ConcurrentRequests.Dec() // Decrement when done
 
 		return c.Next()
-	})
-
-	cpuPercent, erri := cpu.Percent(0, false)
-	if erri != nil {
-		log.Fatal("error getting CPU percent", erri)
-	}
-	fmt.Println("CPU Percent:", cpuPercent)
-
-	vm, erro := mem.VirtualMemory()
-	if erro != nil {
-		log.Fatal("error getting memory usage", erro)
-	}
-	fmt.Println("Memory Usage:", vm.Used)
-
-	app.Use(func(c *fiber.Ctx) error {
-		if err := c.Next(); err != nil {
-			monitoring.TotalErrors.Inc() // Increment error count
-			return err
-		}
-		return nil
 	})
 
 	v := validator.New()
