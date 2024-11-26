@@ -75,13 +75,13 @@ var (
 		[]string{"period"}, // period can be "daily", "weekly", "monthly"
 	)
 	SQLQueryDuration = prometheus.NewHistogramVec(
-	prometheus.HistogramOpts{
-		Name:    "sql_query_duration_seconds",
-		Help:    "Duration of SQL queries in seconds",
-		Buckets: prometheus.ExponentialBuckets(0.001, 2, 10), // Fra 1 ms til ~1 sekund
-	},
-	[]string{"query_type"}, // Labels som "SELECT", "INSERT", "UPDATE", "DELETE"
-)
+		prometheus.HistogramOpts{
+			Name:    "sql_query_duration_seconds",
+			Help:    "Duration of SQL queries in seconds",
+			Buckets: prometheus.ExponentialBuckets(0.001, 2, 10), // Fra 1 ms til ~1 sekund
+		},
+		[]string{"query_type"}, // Labels som "SELECT", "INSERT", "UPDATE", "DELETE"
+	)
 )
 
 // Metrik-definitions
@@ -104,7 +104,6 @@ var (
 	})
 )
 
-
 func init() {
 	// Register metrics with the default registry
 	prometheus.MustRegister(
@@ -117,6 +116,10 @@ func init() {
 		ActiveUsers,
 		DBActiveConnections,
 		SQLQueryDuration,
+		DBActiveConnections,
+		DBIdleConnections,
+		DBInUseConnections,
+		DBMaxOpenConnections,
 	)
 }
 

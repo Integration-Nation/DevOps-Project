@@ -28,6 +28,7 @@ func init() {
 	//initializers.LoadEnv()
 	initializers.ConnectDB()
 	//initializers.ConnectSqlite()
+	initializers.StartDBMonitoring() // Start monitoring of database
 }
 
 func prometheusHandler() fiber.Handler {
