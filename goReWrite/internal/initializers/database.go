@@ -1,7 +1,9 @@
 package initializers
 
 import (
+	"DevOps-Project/internal/monitoring"
 	"os"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -17,4 +19,14 @@ func ConnectDB() {
 	if err != nil {
 		panic("failed to connect database")
 	}
+}
+
+
+func StartDBMonitoring() {
+    go func() {
+        for {
+            monitoring.UpdateDBMetrics(DB) // DB er den globale databaseforbindelse
+            time.Sleep(1 * time.Second)
+        }
+    }()
 }

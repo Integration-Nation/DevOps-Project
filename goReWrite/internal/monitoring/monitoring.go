@@ -9,6 +9,7 @@ import (
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/mem"
+	"gorm.io/gorm"
 )
 
 var (
@@ -73,7 +74,36 @@ var (
 		},
 		[]string{"period"}, // period can be "daily", "weekly", "monthly"
 	)
+	SQLQueryDuration = prometheus.NewHistogramVec(
+	prometheus.HistogramOpts{
+		Name:    "sql_query_duration_seconds",
+		Help:    "Duration of SQL queries in seconds",
+		Buckets: prometheus.ExponentialBuckets(0.001, 2, 10), // Fra 1 ms til ~1 sekund
+	},
+	[]string{"query_type"}, // Labels som "SELECT", "INSERT", "UPDATE", "DELETE"
 )
+)
+
+// Metrik-definitions
+var (
+	DBActiveConnections = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "db_active_connections",
+		Help: "Number of active connections to the database.",
+	})
+	DBIdleConnections = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "db_idle_connections",
+		Help: "Number of idle connections to the database.",
+	})
+	DBInUseConnections = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "db_in_use_connections",
+		Help: "Number of in-use connections to the database.",
+	})
+	DBMaxOpenConnections = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "db_max_open_connections",
+		Help: "Maximum number of open connections to the database.",
+	})
+)
+
 
 func init() {
 	// Register metrics with the default registry
@@ -85,6 +115,8 @@ func init() {
 		HTTPTotalErrors,
 		TotalUsers,
 		ActiveUsers,
+		DBActiveConnections,
+		SQLQueryDuration,
 	)
 }
 
@@ -130,4 +162,25 @@ func UpdateTotalUsers(count int) {
 // UpdateActiveUsers updates the number of active users for a specific time period
 func UpdateActiveUsers(period string, count int) {
 	ActiveUsers.WithLabelValues(period).Set(float64(count))
+}
+func UpdateDBMetrics(db *gorm.DB) {
+	// Hent den underliggende databaseforbindelse
+	sqlDB, err := db.DB()
+	if err != nil {
+		// Hvis vi ikke kan få sql.DB, log fejlen og returnér
+		return
+	}
+
+	stats := sqlDB.Stats()
+
+	// Opdater Prometheus-metrikker
+	DBActiveConnections.Set(float64(stats.OpenConnections))
+	DBIdleConnections.Set(float64(stats.Idle))
+	DBInUseConnections.Set(float64(stats.InUse))
+	DBMaxOpenConnections.Set(float64(sqlDB.Stats().MaxOpenConnections))
+}
+
+func ObserveSQLQuery(queryType string, start time.Time) {
+	duration := time.Since(start).Seconds()
+	SQLQueryDuration.WithLabelValues(queryType).Observe(duration)
 }
