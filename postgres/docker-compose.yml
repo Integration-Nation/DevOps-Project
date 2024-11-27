@@ -9,7 +9,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_HOST=${POSTGRES_HOST}
     ports:
-      - "5432:5432"
+      - "7004:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

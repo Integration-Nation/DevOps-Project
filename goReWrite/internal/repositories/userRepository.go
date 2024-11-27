@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"DevOps-Project/internal/models"
-	"DevOps-Project/internal/utilities"
 	"time"
 
 	"github.com/google/uuid"
@@ -24,10 +23,10 @@ type UserRepository struct {
 	logger *zap.Logger
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
+func NewUserRepository(db *gorm.DB, logger *zap.Logger) *UserRepository {
 	return &UserRepository{
 		db:     db,
-		logger: utilities.NewLogger(),
+		logger: logger,
 	}
 
 }

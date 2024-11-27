@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"DevOps-Project/internal/models"
-	"DevOps-Project/internal/utilities"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -17,11 +16,11 @@ type PageRepository struct {
 	logger *zap.Logger
 }
 
-func NewPageRepository(db *gorm.DB) *PageRepository {
+func NewPageRepository(db *gorm.DB, logger *zap.Logger) *PageRepository {
 
 	return &PageRepository{
 		db:     db,
-		logger: utilities.NewLogger(),
+		logger: logger,
 	}
 }
 

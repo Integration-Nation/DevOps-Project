@@ -3,7 +3,6 @@ package services
 import (
 	"DevOps-Project/internal/models"
 	"DevOps-Project/internal/repositories"
-	"DevOps-Project/internal/utilities"
 
 	"go.uber.org/zap"
 )
@@ -17,10 +16,10 @@ type PageService struct {
 	logger *zap.Logger
 }
 
-func NewPageService(repo repositories.PageRepositoryI) *PageService {
+func NewPageService(repo repositories.PageRepositoryI, logger *zap.Logger) *PageService {
 	return &PageService{
 		repo:   repo,
-		logger: utilities.NewLogger(),
+		logger: logger,
 	}
 }
 

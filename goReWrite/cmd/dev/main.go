@@ -1,10 +1,10 @@
+package main
+
 // @title whoKnows-goFiber
 // @version 0.5.0
 // @description This is a search engine API for managing users and pages.
 // @host localhost:9090
 // @BasePath /
-
-package main
 
 import (
 	"DevOps-Project/internal/controllers"
@@ -26,10 +26,9 @@ import (
 )
 
 func init() {
-	//initializers.LoadEnv()
+	initializers.LoadEnv()
 	initializers.ConnectDB()
 	//initializers.ConnectSqlite()
-	initializers.StartDBMonitoring() // Start monitoring of database
 }
 
 func prometheusHandler() fiber.Handler {
@@ -41,7 +40,6 @@ func prometheusHandler() fiber.Handler {
 }
 
 func main() {
-
 	if err := initializers.DB.AutoMigrate(&models.Page{}); err != nil {
 		log.Fatal(err)
 	}
@@ -79,9 +77,8 @@ func main() {
 	})
 
 	app.Get("/metrics", prometheusHandler())
-
 	v := validator.New()
-	logger := utilities.NewLogger()
+	logger := utilities.NewMockLogger()
 
 	pageRepo := repositories.NewPageRepository(initializers.DB, logger)
 	pageService := services.NewPageService(pageRepo, logger)
@@ -102,16 +99,8 @@ func main() {
 		return c.SendString("Hello, World!")
 	})
 
-	//Start HTTPS server
-	err := app.ListenTLS(":9090", "/etc/letsencrypt/live/integration-nation.dk/fullchain.pem", "/etc/letsencrypt/live/integration-nation.dk/privkey.pem")
-
+	err := app.Listen(":7070")
 	if err != nil {
 		panic(err)
 	}
 }
-
-// 	err := app.Listen(":9090")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
