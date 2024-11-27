@@ -9,6 +9,16 @@
       "database": "whoKnowsDB",
       "username": "integrationNation",
       "password": "hoeHoeHoe69"
+    },
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 7004,
+      "driver": "PostgreSQL",
+      "name": "docker",
+      "database": "whoKnowsDB",
+      "username": "integrationNation",
+      "password": "hoeHoeHoe69"
     }
   ]
 }

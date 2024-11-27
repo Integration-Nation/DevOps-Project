@@ -76,9 +76,10 @@ var (
 	)
 	SQLQueryDuration = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name:    "sql_query_duration_seconds",
-			Help:    "Duration of SQL queries in seconds",
-			Buckets: prometheus.ExponentialBuckets(0.001, 2, 10), // Fra 1 ms til ~1 sekund
+			Namespace: "whoknows",
+			Name:      "sql_query_duration_seconds",
+			Help:      "Duration of SQL queries in seconds",
+			Buckets:   prometheus.ExponentialBuckets(0.001, 2, 10), // Fra 1 ms til ~1 sekund
 		},
 		[]string{"query_type"}, // Labels som "SELECT", "INSERT", "UPDATE", "DELETE"
 	)
@@ -87,20 +88,24 @@ var (
 // Metrik-definitions
 var (
 	DBActiveConnections = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "db_active_connections",
-		Help: "Number of active connections to the database.",
+		Namespace: "whoknows",
+		Name:      "db_active_connections",
+		Help:      "Number of active connections to the database.",
 	})
 	DBIdleConnections = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "db_idle_connections",
-		Help: "Number of idle connections to the database.",
+		Namespace: "whoknows",
+		Name:      "db_idle_connections",
+		Help:      "Number of idle connections to the database.",
 	})
 	DBInUseConnections = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "db_in_use_connections",
-		Help: "Number of in-use connections to the database.",
+		Namespace: "whoknows",
+		Name:      "db_in_use_connections",
+		Help:      "Number of in-use connections to the database.",
 	})
 	DBMaxOpenConnections = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "db_max_open_connections",
-		Help: "Maximum number of open connections to the database.",
+		Namespace: "whoknows",
+		Name:      "db_max_open_connections",
+		Help:      "Maximum number of open connections to the database.",
 	})
 )
 
@@ -114,7 +119,6 @@ func init() {
 		HTTPTotalErrors,
 		TotalUsers,
 		ActiveUsers,
-		DBActiveConnections,
 		SQLQueryDuration,
 		DBActiveConnections,
 		DBIdleConnections,

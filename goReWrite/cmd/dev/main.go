@@ -28,7 +28,7 @@ import (
 func init() {
 	initializers.LoadEnv()
 	initializers.ConnectDB()
-	//initializers.ConnectSqlite()
+	initializers.ConnectSqliteLocal()
 }
 
 func prometheusHandler() fiber.Handler {
@@ -48,7 +48,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// initializers.MigrateUsers()
+	//initializers.MigrateUsers()
 	//initializers.MigratePages()
 
 	jwtSecret := os.Getenv("JWT_SECRET")

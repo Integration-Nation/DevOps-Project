@@ -23,6 +23,18 @@ func ConnectSqlite() {
 	fmt.Println("Connection Opened to Database")
 }
 
+func ConnectSqliteLocal() {
+	var err error
+	dsn := os.Getenv("DATABASE_PATH_LOCAL")
+	SqliteDB, err = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
+
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	fmt.Println("Connection Opened to Database")
+}
+
 func MigrateUsers() {
 	var users []models.User
 
