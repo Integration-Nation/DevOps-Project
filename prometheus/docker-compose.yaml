@@ -5,7 +5,7 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "7070:9090"
+      - "9090:9090"
     networks:
       - app_network
 

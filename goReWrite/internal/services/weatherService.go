@@ -3,7 +3,6 @@ package services
 import (
 	"DevOps-Project/internal/api"
 	"DevOps-Project/internal/models"
-	"DevOps-Project/internal/utilities"
 
 	"go.uber.org/zap"
 )
@@ -16,8 +15,8 @@ type WeatherService struct {
 	logger *zap.Logger
 }
 
-func NewWeatherService() *WeatherService {
-	return &WeatherService{logger: utilities.NewLogger()}
+func NewWeatherService(logger *zap.Logger) *WeatherService {
+	return &WeatherService{logger: logger}
 }
 
 func (ws *WeatherService) GetWeather(latitude, longitude string) (*models.Weather, error) {

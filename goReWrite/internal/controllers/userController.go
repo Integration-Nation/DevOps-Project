@@ -3,7 +3,6 @@ package controllers
 import (
 	"DevOps-Project/internal/models"
 	"DevOps-Project/internal/services"
-	"DevOps-Project/internal/utilities"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -24,11 +23,11 @@ type UserController struct {
 	logger   *zap.Logger
 }
 
-func NewUserController(service services.UserServiceI, validate *validator.Validate) *UserController {
+func NewUserController(service services.UserServiceI, validate *validator.Validate, logger *zap.Logger) *UserController {
 	return &UserController{
 		service:  service,
 		validate: validate,
-		logger:   utilities.NewLogger(),
+		logger:   logger,
 	}
 }
 

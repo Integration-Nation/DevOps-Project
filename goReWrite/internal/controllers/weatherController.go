@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"DevOps-Project/internal/services"
-	"DevOps-Project/internal/utilities"
 
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
@@ -17,10 +16,10 @@ type WeatherController struct {
 	logger  *zap.Logger
 }
 
-func NewWeatherController(service services.WeatherServiceI) *WeatherController {
+func NewWeatherController(service services.WeatherServiceI, logger *zap.Logger) *WeatherController {
 	return &WeatherController{
 		service: service,
-		logger:  utilities.NewLogger(),
+		logger:  logger,
 	}
 }
 

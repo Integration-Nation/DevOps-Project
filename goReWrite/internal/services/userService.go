@@ -5,7 +5,6 @@ import (
 	"DevOps-Project/internal/monitoring"
 	"DevOps-Project/internal/repositories"
 	"DevOps-Project/internal/security"
-	"DevOps-Project/internal/utilities"
 	"errors"
 	"time"
 
@@ -25,10 +24,10 @@ type UserService struct {
 	logger *zap.Logger
 }
 
-func NewUserService(repo repositories.UserRepositoryI) *UserService {
+func NewUserService(repo repositories.UserRepositoryI, logger *zap.Logger) *UserService {
 	service := &UserService{
 		repo:   repo,
-		logger: utilities.NewLogger(),
+		logger: logger,
 	}
 
 	go service.collectUserMetrics()

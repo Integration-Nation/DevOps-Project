@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"DevOps-Project/internal/services"
-	"DevOps-Project/internal/utilities"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -19,11 +18,11 @@ type PageController struct {
 	logger   *zap.Logger
 }
 
-func NewPageController(service services.PageServiceI, validate *validator.Validate) *PageController {
+func NewPageController(service services.PageServiceI, validate *validator.Validate, logger *zap.Logger) *PageController {
 	return &PageController{
 		service:  service,
 		validate: validate,
-		logger:   utilities.NewLogger(),
+		logger:   logger,
 	}
 }
 
