@@ -16,7 +16,7 @@ jobs:
             "embeds": [
               {
                 "title": "New PR merged",
-                "description": ("🚀 A new commit has been merged into **main**!\nCommit: **" + $commit + "**\nBy: **" + $actor + "**"),
+                "description": ("A new commit has been merged into **${{ github.ref_name }}**!\nCommit: **" + $commit + "**\nBy: **" + $actor + "**"),
                 "color": 5814783,
                 "author": {
                   "name": ("Actor: " + $actor)
