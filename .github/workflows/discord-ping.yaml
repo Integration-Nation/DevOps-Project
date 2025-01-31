@@ -16,7 +16,7 @@ jobs:
             "embeds": [
               {
                 "title": "New PR merged",
-                "description": ("🚀 A new commit has been merged into **main**!\nCommit: **" + $commit + "**\nBy: **" + $actor + "**"),
+                "description": ("A new commit has been merged into **${{ github.ref_name }}**!\nCommit: **" + $commit + "**\nBy: **" + $actor + "**"),
                 "color": 5814783,
                 "author": {
                   "name": ("Actor: " + $actor)
@@ -27,5 +27,3 @@ jobs:
           }')
 
           curl -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" ${{ secrets.DISCORD_WEBHOOK }}
-
-#https://discord.com/api/webhooks/1334893857111933020/b3-KM9quIbtIQYomIhPMRi_UJVf4uezHSYhloEIQqUMRjuWKOaq98BSm4TlI7lzOJFyY
